@@ -562,7 +562,7 @@ public partial class BirdieMod
         lbl.fontStyle = FontStyles.Bold;
         lbl.color = Color.white;
         lbl.alignment = TextAlignmentOptions.Center;
-        lbl.enableWordWrapping = false;
+        lbl.textWrappingMode = TextWrappingModes.NoWrap;
 
         buttonOut = btnComp;
         return btn;
@@ -1277,13 +1277,14 @@ public partial class BirdieMod
         float gapY = 6f;
         int cols = 2;
 
-        for (int i = 0; i < SpawnableItemNames.Length && i < SpawnableItemTypeInts.Length; i++)
+        for (int i = 0; i < SpawnableItems.Length; i++)
         {
             int col = i % cols;
             int row2 = i / cols;
-            int capturedTypeInt = SpawnableItemTypeInts[i];
+            SpawnableItemDefinition item = SpawnableItems[i];
+            int capturedTypeInt = item.TypeId;
 
-            GameObject btnObj = CreateUiObject("ItemBtn_" + SpawnableItemNames[i], tab.transform);
+            GameObject btnObj = CreateUiObject("ItemBtn_" + item.DisplayName, tab.transform);
             RectTransform btnRect = btnObj.GetComponent<RectTransform>();
             float anchorXMin = col == 0 ? 0.02f : 0.52f;
             float anchorXMax = col == 0 ? 0.48f : 0.98f;
@@ -1316,7 +1317,7 @@ public partial class BirdieMod
             lblRect.anchorMax = Vector2.one;
             lblRect.offsetMin = new Vector2(6f, 0f);
             lblRect.offsetMax = new Vector2(-6f, 0f);
-            btnTmp.text = SpawnableItemNames[i];
+            btnTmp.text = item.DisplayName;
             btnTmp.fontSize = 12f;
             btnTmp.color = Color.white;
             btnTmp.alignment = TextAlignmentOptions.MidlineLeft;

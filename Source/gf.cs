@@ -40,8 +40,6 @@ public partial class BirdieMod
     private float nextDisplayNameRefreshTime;
     private readonly float displayNameRefreshInterval = 0.5f;
 
-    private int cachedAllGameObjectsFrame = -1;
-    private GameObject[] cachedAllGameObjects;
     private int cachedAllComponentsFrame = -1;
     private Component[] cachedAllComponents;
     private float nextPlayerSearchTime;

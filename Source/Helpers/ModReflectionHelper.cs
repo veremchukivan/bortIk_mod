@@ -6,44 +6,53 @@ internal static class ModReflectionHelper
 {
     private const BindingFlags MemberFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
     private static readonly object CacheLock = new object();
-    private static readonly Dictionary<string, PropertyInfo> PropertyCache = new Dictionary<string, PropertyInfo>(128);
-    private static readonly Dictionary<string, FieldInfo> FieldCache = new Dictionary<string, FieldInfo>(128);
-
-    private static string BuildCacheKey(Type instanceType, string memberName)
-    {
-        return instanceType.AssemblyQualifiedName + "|" + memberName;
-    }
+    private static readonly Dictionary<Type, Dictionary<string, PropertyInfo>> PropertyCache =
+        new Dictionary<Type, Dictionary<string, PropertyInfo>>(32);
+    private static readonly Dictionary<Type, Dictionary<string, FieldInfo>> FieldCache =
+        new Dictionary<Type, Dictionary<string, FieldInfo>>(32);
 
     private static PropertyInfo GetCachedProperty(Type instanceType, string memberName)
     {
-        string key = BuildCacheKey(instanceType, memberName);
         lock (CacheLock)
         {
+            Dictionary<string, PropertyInfo> members;
+            if (!PropertyCache.TryGetValue(instanceType, out members))
+            {
+                members = new Dictionary<string, PropertyInfo>(8);
+                PropertyCache.Add(instanceType, members);
+            }
+
             PropertyInfo property;
-            if (PropertyCache.TryGetValue(key, out property))
+            if (members.TryGetValue(memberName, out property))
             {
                 return property;
             }
 
             property = instanceType.GetProperty(memberName, MemberFlags);
-            PropertyCache[key] = property;
+            members[memberName] = property;
             return property;
         }
     }
 
     private static FieldInfo GetCachedField(Type instanceType, string memberName)
     {
-        string key = BuildCacheKey(instanceType, memberName);
         lock (CacheLock)
         {
+            Dictionary<string, FieldInfo> members;
+            if (!FieldCache.TryGetValue(instanceType, out members))
+            {
+                members = new Dictionary<string, FieldInfo>(8);
+                FieldCache.Add(instanceType, members);
+            }
+
             FieldInfo field;
-            if (FieldCache.TryGetValue(key, out field))
+            if (members.TryGetValue(memberName, out field))
             {
                 return field;
             }
 
             field = instanceType.GetField(memberName, MemberFlags);
-            FieldCache[key] = field;
+            members[memberName] = field;
             return field;
         }
     }

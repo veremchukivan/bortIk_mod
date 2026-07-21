@@ -12,30 +12,18 @@ public partial class BirdieMod
         TryResolveLocalPlayerGolferViaGameManager();
         if (playerMovement == null)
         {
-            GameObject[] allObjects = FindAllGameObjects();
-            for (int i = 0; i < allObjects.Length; i++)
+            Component[] allComponents = FindAllComponents();
+            for (int i = 0; i < allComponents.Length; i++)
             {
-                GameObject obj = allObjects[i];
-                if (obj == null)
+                Component component = allComponents[i];
+                if (component == null || component.GetType().Name != "PlayerMovement" || !IsLocalPlayerMovement(component))
                 {
                     continue;
                 }
 
-                Component[] components = obj.GetComponents<Component>();
-                for (int j = 0; j < components.Length; j++)
-                {
-                    Component comp = components[j];
-                    if (comp == null || comp.GetType().Name != "PlayerMovement" || !IsLocalPlayerMovement(comp))
-                    {
-                        continue;
-                    }
-
-                    playerMovement = comp;
-                    addSpeedBoostMethod = comp.GetType().GetMethod("AddSpeedBoost", BindingFlags.NonPublic | BindingFlags.Instance);
-
-                    i = allObjects.Length;
-                    break;
-                }
+                playerMovement = component;
+                addSpeedBoostMethod = component.GetType().GetMethod("AddSpeedBoost", BindingFlags.NonPublic | BindingFlags.Instance);
+                break;
             }
         }
         else if (addSpeedBoostMethod == null)
@@ -550,18 +538,6 @@ public partial class BirdieMod
 
         cachedLocalPlayerDisplayName = "Unknown";
         return cachedLocalPlayerDisplayName;
-    }
-
-    private GameObject[] FindAllGameObjects()
-    {
-        int currentFrame = Time.frameCount;
-        if (cachedAllGameObjects == null || cachedAllGameObjectsFrame != currentFrame)
-        {
-            cachedAllGameObjects = UnityEngine.Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
-            cachedAllGameObjectsFrame = currentFrame;
-        }
-
-        return cachedAllGameObjects;
     }
 
     private Component[] FindAllComponents()

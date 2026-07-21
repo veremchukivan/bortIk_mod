@@ -467,9 +467,8 @@ public partial class BirdieMod
         return keyName.ToUpperInvariant();
     }
 
-    private bool WasConfiguredKeyPressed(Key configuredKey)
+    private bool WasConfiguredKeyPressed(Keyboard keyboard, Key configuredKey)
     {
-        Keyboard keyboard = Keyboard.current;
         if (keyboard == null || configuredKey == Key.None)
         {
             return false;

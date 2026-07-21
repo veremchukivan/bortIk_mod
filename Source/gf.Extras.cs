@@ -36,7 +36,7 @@ public partial class BirdieMod
             }
 
             // Find the WindManager instance in the scene
-            UnityEngine.Object wmObj = UnityEngine.Object.FindObjectOfType(wmType);
+            UnityEngine.Object wmObj = UnityEngine.Object.FindFirstObjectByType(wmType);
             if (wmObj == null)
             {
                 BirdieLog.Warning("[Birdie] WindManager not found in scene");

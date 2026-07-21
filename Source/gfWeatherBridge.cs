@@ -148,6 +148,7 @@ internal static class BirdieWeatherBridge
             return;
         }
 
+        object writer = null;
         try
         {
             Component inventory = cachedLocalPlayerInventoryProperty.GetValue(null, null) as Component;
@@ -161,7 +162,7 @@ internal static class BirdieWeatherBridge
             byte componentIndex = (byte)mirrorNbComponentIndex.GetValue(inventory, null);
 
             // Serialise byte + bool arguments.
-            object writer = mirrorWriterPoolGet.Invoke(null, null);
+            writer = mirrorWriterPoolGet.Invoke(null, null);
             mirrorWriterExtWriteByte.Invoke(null, new object[] { writer, weatherType });
             mirrorWriterExtWriteBool.Invoke(null, new object[] { writer, weatherAllowed });
             ArraySegment<byte> payload = (ArraySegment<byte>)mirrorWriterToArraySegment.Invoke(writer, null);
@@ -176,12 +177,23 @@ internal static class BirdieWeatherBridge
             // Send to all clients — channel 0 = Channels.Reliable.
             mirrorNsSendToAll.Invoke(null, new object[] { rpcMsg, 0 });
 
-            // Return the writer to the pool after send.
-            mirrorWriterPoolReturn.Invoke(null, new object[] { writer });
         }
         catch (Exception ex)
         {
             BirdieLog.Warning("[Birdie] Weather bridge (broadcast): " + ex.Message);
+        }
+        finally
+        {
+            if (writer != null)
+            {
+                try
+                {
+                    mirrorWriterPoolReturn.Invoke(null, new object[] { writer });
+                }
+                catch
+                {
+                }
+            }
         }
     }
 

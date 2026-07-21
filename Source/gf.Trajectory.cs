@@ -7,6 +7,7 @@ public partial class BirdieMod
 {
     private void UpdateTrails()
     {
+        EnsureTrailRenderers();
         UpdateActualTrail();
         bool ballMoving = IsBallMovingForPrediction();
         UpdatePredictedTrail(ballMoving);
@@ -14,8 +15,6 @@ public partial class BirdieMod
 
     private void UpdateActualTrail()
     {
-        EnsureTrailRenderers();
-
         if (!actualTrailEnabled)
         {
             if (shotPathLine != null)
@@ -79,7 +78,6 @@ public partial class BirdieMod
 
     private void UpdatePredictedTrail(bool ballMoving)
     {
-        EnsureTrailRenderers();
         if (predictedPathLine == null || frozenPredictedPathLine == null)
         {
             return;
@@ -1311,6 +1309,7 @@ public partial class BirdieMod
         {
             Component[] allComponents = FindAllComponents();
             Vector3 referencePosition = golfBall != null ? golfBall.transform.position : playerGolfer.transform.position;
+            Vector3 flatReferencePosition = new Vector3(referencePosition.x, 0f, referencePosition.z);
             float closestHoleDistanceSq = float.MaxValue;
             bool foundHole = false;
 
@@ -1329,7 +1328,6 @@ public partial class BirdieMod
                     continue;
                 }
 
-                Vector3 flatReferencePosition = new Vector3(referencePosition.x, 0f, referencePosition.z);
                 Vector3 flatHoleCandidate = new Vector3(holeCandidate.x, 0f, holeCandidate.z);
                 float distanceSq = (flatHoleCandidate - flatReferencePosition).sqrMagnitude;
                 if (distanceSq <= 0.0025f || distanceSq >= closestHoleDistanceSq)

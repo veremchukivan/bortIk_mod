@@ -324,98 +324,69 @@ public partial class BirdieMod
 
     private void CreateActualTrailRenderer()
     {
-        shotPathObject = new GameObject("BirdieShotTrail");
-        UnityEngine.Object.DontDestroyOnLoad(shotPathObject);
-        shotPathLine = shotPathObject.AddComponent<LineRenderer>();
-        shotPathLine.positionCount = 0;
-        shotPathLine.startWidth = 0.06f;
-        shotPathLine.endWidth = 0.04f;
-        shotPathLine.useWorldSpace = true;
-        shotPathLine.numCapVertices = 10;
-        shotPathLine.numCornerVertices = 10;
-        shotPathLine.alignment = LineAlignment.View;
-        shotPathLine.textureMode = LineTextureMode.Stretch;
-        shotPathLine.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        shotPathLine.receiveShadows = false;
-        shotPathLine.sortingOrder = 32760;
-
-        Shader shader = Shader.Find("Sprites/Default");
-        shotPathMaterial = new Material(shader);
-        shotPathMaterial.color = new Color(1f, 0.58f, 0.20f, 1f);
-        shotPathMaterial.renderQueue = 5000;
-        if (shotPathMaterial.HasProperty("_ZWrite"))
-        {
-            shotPathMaterial.SetInt("_ZWrite", 0);
-        }
-        if (shotPathMaterial.HasProperty("_ZTest"))
-        {
-            shotPathMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Always);
-        }
-        shotPathLine.material = shotPathMaterial;
+        shotPathLine = CreateTrailRenderer(
+            "BirdieShotTrail", 0.06f, 0.04f, 10, 32760,
+            new Color(1f, 0.58f, 0.20f, 1f), 5000,
+            out shotPathObject, out shotPathMaterial);
     }
 
     private void CreatePredictedTrailRenderer()
     {
-        predictedPathObject = new GameObject("BirdiePredictedTrail");
-        UnityEngine.Object.DontDestroyOnLoad(predictedPathObject);
-        predictedPathLine = predictedPathObject.AddComponent<LineRenderer>();
-        predictedPathLine.positionCount = 0;
-        predictedPathLine.startWidth = 0.03f;
-        predictedPathLine.endWidth = 0.02f;
-        predictedPathLine.useWorldSpace = true;
-        predictedPathLine.numCapVertices = 8;
-        predictedPathLine.numCornerVertices = 8;
-        predictedPathLine.alignment = LineAlignment.View;
-        predictedPathLine.textureMode = LineTextureMode.Stretch;
-        predictedPathLine.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        predictedPathLine.receiveShadows = false;
-        predictedPathLine.sortingOrder = 32759;
-
-        Shader shader = Shader.Find("Sprites/Default");
-        predictedPathMaterial = new Material(shader);
-        predictedPathMaterial.color = new Color(0.36f, 0.95f, 0.46f, 0.95f);
-        predictedPathMaterial.renderQueue = 4999;
-        if (predictedPathMaterial.HasProperty("_ZWrite"))
-        {
-            predictedPathMaterial.SetInt("_ZWrite", 0);
-        }
-        if (predictedPathMaterial.HasProperty("_ZTest"))
-        {
-            predictedPathMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Always);
-        }
-        predictedPathLine.material = predictedPathMaterial;
+        predictedPathLine = CreateTrailRenderer(
+            "BirdiePredictedTrail", 0.03f, 0.02f, 8, 32759,
+            new Color(0.36f, 0.95f, 0.46f, 0.95f), 4999,
+            out predictedPathObject, out predictedPathMaterial);
     }
 
     private void CreateFrozenTrailRenderer()
     {
-        frozenPredictedPathObject = new GameObject("BirdieFrozenTrail");
-        UnityEngine.Object.DontDestroyOnLoad(frozenPredictedPathObject);
-        frozenPredictedPathLine = frozenPredictedPathObject.AddComponent<LineRenderer>();
-        frozenPredictedPathLine.positionCount = 0;
-        frozenPredictedPathLine.startWidth = 0.034f;
-        frozenPredictedPathLine.endWidth = 0.024f;
-        frozenPredictedPathLine.useWorldSpace = true;
-        frozenPredictedPathLine.numCapVertices = 8;
-        frozenPredictedPathLine.numCornerVertices = 8;
-        frozenPredictedPathLine.alignment = LineAlignment.View;
-        frozenPredictedPathLine.textureMode = LineTextureMode.Stretch;
-        frozenPredictedPathLine.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        frozenPredictedPathLine.receiveShadows = false;
-        frozenPredictedPathLine.sortingOrder = 32758;
+        frozenPredictedPathLine = CreateTrailRenderer(
+            "BirdieFrozenTrail", 0.034f, 0.024f, 8, 32758,
+            new Color(0.36f, 0.74f, 1f, 0.92f), 4998,
+            out frozenPredictedPathObject, out frozenPredictedPathMaterial);
+    }
 
-        Shader shader = Shader.Find("Sprites/Default");
-        frozenPredictedPathMaterial = new Material(shader);
-        frozenPredictedPathMaterial.color = new Color(0.36f, 0.74f, 1f, 0.92f);
-        frozenPredictedPathMaterial.renderQueue = 4998;
-        if (frozenPredictedPathMaterial.HasProperty("_ZWrite"))
+    private LineRenderer CreateTrailRenderer(
+        string objectName,
+        float startWidth,
+        float endWidth,
+        int capVertices,
+        int sortingOrder,
+        Color color,
+        int renderQueue,
+        out GameObject trailObject,
+        out Material trailMaterial)
+    {
+        trailObject = new GameObject(objectName);
+        UnityEngine.Object.DontDestroyOnLoad(trailObject);
+
+        LineRenderer lineRenderer = trailObject.AddComponent<LineRenderer>();
+        lineRenderer.positionCount = 0;
+        lineRenderer.startWidth = startWidth;
+        lineRenderer.endWidth = endWidth;
+        lineRenderer.useWorldSpace = true;
+        lineRenderer.numCapVertices = capVertices;
+        lineRenderer.numCornerVertices = capVertices;
+        lineRenderer.alignment = LineAlignment.View;
+        lineRenderer.textureMode = LineTextureMode.Stretch;
+        lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        lineRenderer.receiveShadows = false;
+        lineRenderer.sortingOrder = sortingOrder;
+
+        trailMaterial = new Material(Shader.Find("Sprites/Default"));
+        trailMaterial.color = color;
+        trailMaterial.renderQueue = renderQueue;
+        if (trailMaterial.HasProperty("_ZWrite"))
         {
-            frozenPredictedPathMaterial.SetInt("_ZWrite", 0);
+            trailMaterial.SetInt("_ZWrite", 0);
         }
-        if (frozenPredictedPathMaterial.HasProperty("_ZTest"))
+        if (trailMaterial.HasProperty("_ZTest"))
         {
-            frozenPredictedPathMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Always);
+            trailMaterial.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Always);
         }
-        frozenPredictedPathLine.material = frozenPredictedPathMaterial;
+
+        lineRenderer.material = trailMaterial;
+        return lineRenderer;
     }
 
     private void ResetTrailState()
@@ -616,15 +587,16 @@ public partial class BirdieMod
             " or Esc to close</color>");
         sb.AppendLine();
 
-        for (int i = 0; i < SpawnableItemTypeInts.Length; i++)
+        for (int i = 0; i < SpawnableItems.Length; i++)
         {
+            SpawnableItemDefinition item = SpawnableItems[i];
             sb.Append("<color=#49BFFF><b>[ ")
-              .Append(ModTextHelper.EscapeRichText(SpawnableItemKeyLabels[i]))
+              .Append(ModTextHelper.EscapeRichText(item.KeyLabel))
               .Append(" ]</b></color>  <b>")
-              .Append(ModTextHelper.EscapeRichText(SpawnableItemNames[i]))
+              .Append(ModTextHelper.EscapeRichText(item.DisplayName))
               .Append("</b>");
 
-            if (SpawnableItemTypeInts[i] != CoffeeItemTypeInt)
+            if (item.TypeId != CoffeeItemTypeInt)
             {
                 sb.Append("  <color=#8291A8>HOST REQUIRED</color>");
             }

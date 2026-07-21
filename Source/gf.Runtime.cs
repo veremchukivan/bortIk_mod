@@ -102,77 +102,78 @@ public partial class BirdieMod
 
     private void HandleKeyboardShortcuts()
     {
-        if (Keyboard.current == null)
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard == null)
         {
             return;
         }
 
-        if (WasConfiguredKeyPressed(assistToggleKey))
+        if (WasConfiguredKeyPressed(keyboard, assistToggleKey))
         {
             ToggleAssist();
         }
 
-        if (WasConfiguredKeyPressed(coffeeBoostKey))
+        if (WasConfiguredKeyPressed(keyboard, coffeeBoostKey))
         {
             AddCoffeeBoost();
         }
 
-        if (WasConfiguredKeyPressed(nearestBallModeKey))
+        if (WasConfiguredKeyPressed(keyboard, nearestBallModeKey))
         {
             ToggleNearestBallMode();
         }
 
-        if (WasConfiguredKeyPressed(unlockAllCosmeticsKey))
+        if (WasConfiguredKeyPressed(keyboard, unlockAllCosmeticsKey))
         {
             UnlockAllCosmetics();
         }
 
-        if (WasConfiguredKeyPressed(hudToggleKey))
+        if (WasConfiguredKeyPressed(keyboard, hudToggleKey))
         {
             ToggleHudVisibility();
         }
 
-        if (WasConfiguredKeyPressed(randomItemKey))
+        if (WasConfiguredKeyPressed(keyboard, randomItemKey))
         {
             TryCollectFromCrate();
         }
 
-        if (WasConfiguredKeyPressed(iceToggleKey))
+        if (WasConfiguredKeyPressed(keyboard, iceToggleKey))
         {
             ToggleIceImmunity();
         }
 
-        if (WasConfiguredKeyPressed(noWindKey))
+        if (WasConfiguredKeyPressed(keyboard, noWindKey))
         {
             ToggleNoWind();
         }
 
-        if (WasConfiguredKeyPressed(noAirDragKey))
+        if (WasConfiguredKeyPressed(keyboard, noAirDragKey))
         {
             ToggleNoAirDrag();
         }
 
-        if (WasConfiguredKeyPressed(speedMultiplierKey))
+        if (WasConfiguredKeyPressed(keyboard, speedMultiplierKey))
         {
             ToggleSpeedMultiplier();
         }
 
-        if (WasConfiguredKeyPressed(infiniteAmmoKey))
+        if (WasConfiguredKeyPressed(keyboard, infiniteAmmoKey))
         {
             ToggleInfiniteAmmo();
         }
 
-        if (WasConfiguredKeyPressed(noKnockbackKey))
+        if (WasConfiguredKeyPressed(keyboard, noKnockbackKey))
         {
             ToggleNoKnockback();
         }
 
-        if (WasConfiguredKeyPressed(landmineImmunityKey))
+        if (WasConfiguredKeyPressed(keyboard, landmineImmunityKey))
         {
             ToggleLandmineImmunity();
         }
 
-        if (WasConfiguredKeyPressed(settingsKey))
+        if (WasConfiguredKeyPressed(keyboard, settingsKey))
         {
             ToggleRosettaSettings();
         }
@@ -184,7 +185,7 @@ public partial class BirdieMod
             return;
         }
 
-        if (WasConfiguredKeyPressed(itemSpawnerKey))
+        if (WasConfiguredKeyPressed(keyboard, itemSpawnerKey))
         {
             itemMenuOpen = !itemMenuOpen;
             UpdateItemMenuVisibility();
@@ -192,18 +193,18 @@ public partial class BirdieMod
 
         if (itemMenuOpen)
         {
-            if (Keyboard.current.escapeKey.wasPressedThisFrame)
+            if (keyboard.escapeKey.wasPressedThisFrame)
             {
                 itemMenuOpen = false;
                 UpdateItemMenuVisibility();
                 return;
             }
 
-            for (int i = 0; i < SpawnableItemKeys.Length; i++)
+            for (int i = 0; i < SpawnableItems.Length; i++)
             {
-                if (Keyboard.current[SpawnableItemKeys[i]].wasPressedThisFrame)
+                if (keyboard[SpawnableItems[i].SelectionKey].wasPressedThisFrame)
                 {
-                    SpawnItemClientSide(SpawnableItemTypeInts[i]);
+                    SpawnItemClientSide(SpawnableItems[i].TypeId);
                     itemMenuOpen = false;
                     UpdateItemMenuVisibility();
                     return;

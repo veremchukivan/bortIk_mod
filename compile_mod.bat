@@ -14,8 +14,10 @@ if not exist "%GAME_ROOT%\Super Battle Golf.exe" (
     echo [ERROR] Invalid game folder: %GAME_ROOT%
     exit /b 1
 )
-if not exist "%GAME_ROOT%\BepInEx\core\BepInEx.dll" (
-    echo [ERROR] BepInEx is required to build gf Mod.
+set "BEPINEX_DLL=%GAME_ROOT%\BepInEx\core\BepInEx.dll"
+if not exist "%BEPINEX_DLL%" set "BEPINEX_DLL=Installer\_PayloadStage\BepInEx\core\BepInEx.dll"
+if not exist "%BEPINEX_DLL%" (
+    echo [ERROR] BepInEx.dll was not found in the game folder or installer payload.
     exit /b 1
 )
 
@@ -38,7 +40,7 @@ set "RSP_FILE=Mods\gfMod.BepInEx.rsp"
 >> "%RSP_FILE%" echo /define:BEPINEX
 >> "%RSP_FILE%" echo /out:"Mods\gfMod.BepInEx.dll"
 >> "%RSP_FILE%" echo /pdb:"Mods\gfMod.BepInEx.pdb"
->> "%RSP_FILE%" echo /reference:"%GAME_ROOT%\BepInEx\core\BepInEx.dll"
+>> "%RSP_FILE%" echo /reference:"%BEPINEX_DLL%"
 
 for %%R in (
     UnityEngine.dll

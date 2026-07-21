@@ -27,7 +27,8 @@ public partial class BirdieMod
     private AudioClip   _clipWindGust;
     private AudioClip   _clipThunderCrack;
     private AudioClip   _clipTornadoLoop;
-    private bool        _soundsLoaded;
+    private Material    _weatherParticleMaterial;
+    private const float PlayerStrikeFlashRadiusSquared = 25f;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Start / Stop
@@ -76,8 +77,9 @@ public partial class BirdieMod
             case WeatherType.Tornado:
                 _rainPs = CreateRainParticles(0.4f, 18f, 0.05f);
                 ParentToRoot(_rainPs.gameObject);
+                Camera tornadoCamera = Camera.main;
                 Vector3 spawnPos = _tornadoPositionSet ? _tornadoWorldPosition
-                    : (Camera.main != null ? Camera.main.transform.position + Camera.main.transform.forward * 30f : Vector3.zero);
+                    : (tornadoCamera != null ? tornadoCamera.transform.position + tornadoCamera.transform.forward * 30f : Vector3.zero);
                 _tornadoPs = CreateTornadoParticles(spawnPos);
                 ParentToRoot(_tornadoPs.gameObject);
                 PlayLoop(_weatherAudio, _clipTornadoLoop ?? _clipWindLoop, 1.0f);
@@ -113,6 +115,12 @@ public partial class BirdieMod
         if (_lightningLight != null && _lightningLight.gameObject != null)
             UnityEngine.Object.Destroy(_lightningLight.gameObject);
 
+        if (_weatherParticleMaterial != null)
+        {
+            UnityEngine.Object.Destroy(_weatherParticleMaterial);
+            _weatherParticleMaterial = null;
+        }
+
         _rainPs               = null;
         _tornadoPs            = null;
         _lightningLight       = null;
@@ -131,9 +139,10 @@ public partial class BirdieMod
         float now = Time.time;
 
         // Move rain emitter with camera every frame (same pattern as WindManager.UpdateVfxPosition)
-        if (_rainPs != null && Camera.main != null)
+        Camera activeCamera = Camera.main;
+        if (_rainPs != null && activeCamera != null)
         {
-            Transform cam = Camera.main.transform;
+            Transform cam = activeCamera.transform;
             _rainPs.transform.position = cam.position + Vector3.up * 14f + cam.forward * 12f;
             _rainPs.transform.rotation = Quaternion.Euler(12f, cam.eulerAngles.y, 0f);
         }
@@ -202,10 +211,12 @@ public partial class BirdieMod
         GameObject go = new GameObject("BirdieRain");
 
         // Position is updated every frame in WeatherVFXUpdate to follow the camera
-        go.transform.position = Camera.main != null
-            ? Camera.main.transform.position + Vector3.up * 14f + Camera.main.transform.forward * 12f
+        Camera activeCamera = Camera.main;
+        Transform cameraTransform = activeCamera != null ? activeCamera.transform : null;
+        go.transform.position = cameraTransform != null
+            ? cameraTransform.position + Vector3.up * 14f + cameraTransform.forward * 12f
             : Vector3.up * 14f;
-        go.transform.rotation = Quaternion.Euler(12f, Camera.main != null ? Camera.main.transform.eulerAngles.y : 0f, 0f);
+        go.transform.rotation = Quaternion.Euler(12f, cameraTransform != null ? cameraTransform.eulerAngles.y : 0f, 0f);
 
         ParticleSystem ps = go.AddComponent<ParticleSystem>();
 
@@ -234,8 +245,7 @@ public partial class BirdieMod
         renderer.renderMode    = ParticleSystemRenderMode.Stretch;
         renderer.velocityScale = 0.04f;
         renderer.lengthScale   = 2.5f;
-        renderer.material      = new Material(
-            Shader.Find("Particles/Standard Unlit") ?? Shader.Find("Sprites/Default"));
+        renderer.sharedMaterial = GetWeatherParticleMaterial();
 
         return ps;
     }
@@ -284,8 +294,7 @@ public partial class BirdieMod
         rend.renderMode    = ParticleSystemRenderMode.Stretch;
         rend.velocityScale = 0.20f;
         rend.lengthScale   = 12f;
-        rend.material      = new Material(
-            Shader.Find("Particles/Standard Unlit") ?? Shader.Find("Sprites/Default"));
+        rend.sharedMaterial = GetWeatherParticleMaterial();
         ps.Play();
 
         // ── Layer 2: ground dust swirl (Billboard, small) ─────────────────────
@@ -321,8 +330,7 @@ public partial class BirdieMod
 
         var ringRend = ringGo.GetComponent<ParticleSystemRenderer>();
         ringRend.renderMode = ParticleSystemRenderMode.Billboard;
-        ringRend.material   = new Material(
-            Shader.Find("Particles/Standard Unlit") ?? Shader.Find("Sprites/Default"));
+        ringRend.sharedMaterial = GetWeatherParticleMaterial();
         ringPs.Play();
 
         // ── Layer 3: debris (small chunks, Billboard) ─────────────────────────
@@ -361,11 +369,21 @@ public partial class BirdieMod
 
         var debrisRend = debrisGo.GetComponent<ParticleSystemRenderer>();
         debrisRend.renderMode = ParticleSystemRenderMode.Billboard;
-        debrisRend.material   = new Material(
-            Shader.Find("Particles/Standard Unlit") ?? Shader.Find("Sprites/Default"));
+        debrisRend.sharedMaterial = GetWeatherParticleMaterial();
         debrisPs.Play();
 
         return ps;
+    }
+
+    private Material GetWeatherParticleMaterial()
+    {
+        if (_weatherParticleMaterial == null)
+        {
+            Shader shader = Shader.Find("Particles/Standard Unlit") ?? Shader.Find("Sprites/Default");
+            _weatherParticleMaterial = new Material(shader);
+        }
+
+        return _weatherParticleMaterial;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -396,8 +414,8 @@ public partial class BirdieMod
         // Red struck flash if local player was the target
         if (playerMovement != null)
         {
-            float dist = Vector3.Distance(playerMovement.transform.position, strikePosition);
-            if (dist < 5f)
+            Vector3 playerOffset = playerMovement.transform.position - strikePosition;
+            if (playerOffset.sqrMagnitude < PlayerStrikeFlashRadiusSquared)
             {
                 _playerStruckFlash    = true;
                 _playerStruckFlashEnd = Time.time + 0.45f;
@@ -447,7 +465,6 @@ public partial class BirdieMod
         yield return LoadClip(soundsDir, "wind_gust.mp3",     AudioType.MPEG, c => _clipWindGust     = c);
         yield return LoadClip(soundsDir, "thunder_crack.mp3", AudioType.MPEG, c => _clipThunderCrack = c);
         yield return LoadClip(soundsDir, "tornado_loop.mp3",  AudioType.MPEG, c => _clipTornadoLoop  = c);
-        _soundsLoaded = true;
         BirdieLog.Msg("[Birdie] Weather sounds loaded.");
     }
 

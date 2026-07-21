@@ -50,6 +50,7 @@ public partial class BirdieMod
     private PropertyInfo _wWmAngleProp;
     private bool         _gustRunning;
     private bool         _lightningRunning;
+    private const float  TornadoFlingRadiusSquared = 144f;
 
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -115,14 +116,14 @@ public partial class BirdieMod
         if (_currentWeatherType != (byte)WeatherType.Tornado
             || !_tornadoPositionSet || playerMovement == null) return;
 
-        float dist = Vector3.Distance(playerMovement.transform.position, _tornadoWorldPosition);
-        if (dist >= 12f) return;
+        Vector3 playerOffset = playerMovement.transform.position - _tornadoWorldPosition;
+        if (playerOffset.sqrMagnitude >= TornadoFlingRadiusSquared) return;
         if (Time.time < _tornadoFlingNextTime) return;
 
         _tornadoFlingNextTime = Time.time + 1.2f;
         try
         {
-            Vector3 outward = (playerMovement.transform.position - _tornadoWorldPosition).normalized;
+            Vector3 outward = playerOffset.normalized;
             Vector3 fling   = Vector3.up * 18f + outward * 14f;
             FlingPlayer(playerMovement, fling);
         }
@@ -256,7 +257,7 @@ public partial class BirdieMod
             { wmType = asm.GetType("WindManager"); if (wmType != null) break; }
             if (wmType == null) { BirdieLog.Warning("[Birdie] Weather wind: WindManager not found"); return; }
 
-            UnityEngine.Object wmObj = UnityEngine.Object.FindObjectOfType(wmType);
+            UnityEngine.Object wmObj = UnityEngine.Object.FindFirstObjectByType(wmType);
             if (wmObj == null) { BirdieLog.Warning("[Birdie] Weather wind: WindManager not in scene"); return; }
 
             FieldInfo wsF = wmType.GetField("windSettings",
@@ -333,7 +334,7 @@ public partial class BirdieMod
                 {
                     if (_wWmType != null && _wWmSpeedProp != null && _wWmAngleProp != null)
                     {
-                        UnityEngine.Object wm = UnityEngine.Object.FindObjectOfType(_wWmType);
+                        UnityEngine.Object wm = UnityEngine.Object.FindFirstObjectByType(_wWmType);
                         if (wm != null)
                         {
                             _wWmSpeedProp.SetValue(wm, gustSpeed, null);
@@ -366,7 +367,9 @@ public partial class BirdieMod
                 { pmType = asm.GetType("PlayerMovement"); if (pmType != null) break; }
                 if (pmType == null) continue;
 
-                UnityEngine.Object[] players = UnityEngine.Object.FindObjectsOfType(pmType);
+                UnityEngine.Object[] players = UnityEngine.Object.FindObjectsByType(
+                    pmType,
+                    FindObjectsSortMode.None);
                 if (players == null || players.Length == 0) continue;
 
                 Component target = players[UnityEngine.Random.Range(0, players.Length)] as Component;
@@ -447,7 +450,7 @@ public partial class BirdieMod
         try
         {
             if (_wWmType == null || _wWmSpeedProp == null || _wWmAngleProp == null) return;
-            UnityEngine.Object wm = UnityEngine.Object.FindObjectOfType(_wWmType);
+            UnityEngine.Object wm = UnityEngine.Object.FindFirstObjectByType(_wWmType);
             if (wm == null) return;
             _wWmSpeedProp.SetValue(wm, speed, null);
             _wWmAngleProp.SetValue(wm, UnityEngine.Random.Range(0, 360), null);

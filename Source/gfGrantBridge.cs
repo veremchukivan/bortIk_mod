@@ -133,13 +133,14 @@ internal static class BirdieGrantBridge
             return;
         }
 
+        object writer = null;
         try
         {
             uint netId = (uint)mirrorNbNetId.GetValue(inventory, null);
             byte componentIndex = (byte)mirrorNbComponentIndex.GetValue(inventory, null);
 
             // Serialise the single int argument.
-            object writer = mirrorWriterPoolGet.Invoke(null, null);
+            writer = mirrorWriterPoolGet.Invoke(null, null);
             mirrorWriterExtWriteInt.Invoke(null, new object[] { writer, itemTypeInt });
             ArraySegment<byte> payload = (ArraySegment<byte>)mirrorWriterToArraySegment.Invoke(writer, null);
 
@@ -155,12 +156,23 @@ internal static class BirdieGrantBridge
             // serialisation of payload (WriteArraySegmentAndSize) reads valid bytes.
             mirrorNcSend.Invoke(null, new object[] { cmdMsg, 0 });
 
-            // Return the writer to the pool after send.
-            mirrorWriterPoolReturn.Invoke(null, new object[] { writer });
         }
         catch (Exception ex)
         {
             BirdieLog.Warning("[Birdie] Item spawner (client bridge): " + ex.Message);
+        }
+        finally
+        {
+            if (writer != null)
+            {
+                try
+                {
+                    mirrorWriterPoolReturn.Invoke(null, new object[] { writer });
+                }
+                catch
+                {
+                }
+            }
         }
     }
 

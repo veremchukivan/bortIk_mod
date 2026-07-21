@@ -8,87 +8,50 @@ public partial class BirdieMod
     // All other items require host access or the BirdieGrantBridge fallback.
     private const int CoffeeItemTypeInt = 1;
 
-    // Stable menu identifiers. The actual ItemType enum value is resolved by name
-    // at runtime, so this keeps working if the game changes the enum order.
-    private static readonly int[] SpawnableItemTypeInts = new int[]
+    private struct SpawnableItemDefinition
     {
-         1,  // Coffee
-         2,  // DuelingPistol
-         3,  // ElephantGun
-         4,  // Airhorn
-         5,  // SpringBoots
-         6,  // GolfCart
-         7,  // RocketLauncher
-         8,  // Landmine
-         9,  // Electromagnet
-        10,  // OrbitalLaser
-        11,  // RocketDriver
-        12,  // FreezeBomb
-        13,  // JumboBurger
-        14,  // FlashCamera
-        15,  // SmokeBomb
-        16,  // RailGun
-        17,  // Thunderstorm
-    };
+        internal readonly int TypeId;
+        internal readonly string DisplayName;
+        internal readonly string EnumName;
+        internal readonly UnityEngine.InputSystem.Key SelectionKey;
+        internal readonly string KeyLabel;
 
-    // Human-readable labels shown in the menu, parallel to SpawnableItemTypeInts.
-    private static readonly string[] SpawnableItemNames = new string[]
-    {
-        "Coffee",
-        "Dueling Pistol",
-        "Elephant Gun",
-        "Airhorn",
-        "Spring Boots",
-        "Golf Cart",
-        "Rocket Launcher",
-        "Landmine",
-        "Electromagnet",
-        "Orbital Laser",
-        "Rocket Driver",
-        "Freeze Bomb",
-        "Jumbo Burger",
-        "Flash Camera",
-        "Smoke Bomb",
-        "Rail Gun",
-        "Thunderstorm",
-    };
+        internal SpawnableItemDefinition(
+            int typeId,
+            string displayName,
+            string enumName,
+            UnityEngine.InputSystem.Key selectionKey,
+            string keyLabel)
+        {
+            TypeId = typeId;
+            DisplayName = displayName;
+            EnumName = enumName;
+            SelectionKey = selectionKey;
+            KeyLabel = keyLabel;
+        }
+    }
 
-    // Names in the game's ItemType enum, parallel to SpawnableItemTypeInts.
-    private static readonly string[] SpawnableItemEnumNames = new string[]
+    // The runtime enum name is stored with the menu metadata, keeping every
+    // property of a spawnable item in one place if the game adds or changes one.
+    private static readonly SpawnableItemDefinition[] SpawnableItems =
     {
-        "Coffee", "DuelingPistol", "ElephantGun", "Airhorn", "SpringBoots",
-        "GolfCart", "RocketLauncher", "Landmine", "Electromagnet", "OrbitalLaser",
-        "RocketDriver", "FreezeBomb", "JumboBurger", "FlashCamera", "SmokeBomb",
-        "Railgun", "Thunderstorm",
-    };
-
-    // Keys that select each item while the menu is open. Index matches SpawnableItemTypeInts.
-    private static readonly UnityEngine.InputSystem.Key[] SpawnableItemKeys = new UnityEngine.InputSystem.Key[]
-    {
-        UnityEngine.InputSystem.Key.Digit1,
-        UnityEngine.InputSystem.Key.Digit2,
-        UnityEngine.InputSystem.Key.Digit3,
-        UnityEngine.InputSystem.Key.Digit4,
-        UnityEngine.InputSystem.Key.Digit5,
-        UnityEngine.InputSystem.Key.Digit6,
-        UnityEngine.InputSystem.Key.Digit7,
-        UnityEngine.InputSystem.Key.Digit8,
-        UnityEngine.InputSystem.Key.Digit9,
-        UnityEngine.InputSystem.Key.Digit0,
-        UnityEngine.InputSystem.Key.Minus,
-        UnityEngine.InputSystem.Key.Equals,
-        UnityEngine.InputSystem.Key.F6,
-        UnityEngine.InputSystem.Key.F7,
-        UnityEngine.InputSystem.Key.F8,
-        UnityEngine.InputSystem.Key.F9,
-        UnityEngine.InputSystem.Key.F10,
-    };
-
-    // Labels displayed next to each item in the menu, parallel to SpawnableItemKeys.
-    private static readonly string[] SpawnableItemKeyLabels = new string[]
-    {
-        "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=",
-        "F6", "F7", "F8", "F9", "F10",
+        new SpawnableItemDefinition(1, "Coffee", "Coffee", UnityEngine.InputSystem.Key.Digit1, "1"),
+        new SpawnableItemDefinition(2, "Dueling Pistol", "DuelingPistol", UnityEngine.InputSystem.Key.Digit2, "2"),
+        new SpawnableItemDefinition(3, "Elephant Gun", "ElephantGun", UnityEngine.InputSystem.Key.Digit3, "3"),
+        new SpawnableItemDefinition(4, "Airhorn", "Airhorn", UnityEngine.InputSystem.Key.Digit4, "4"),
+        new SpawnableItemDefinition(5, "Spring Boots", "SpringBoots", UnityEngine.InputSystem.Key.Digit5, "5"),
+        new SpawnableItemDefinition(6, "Golf Cart", "GolfCart", UnityEngine.InputSystem.Key.Digit6, "6"),
+        new SpawnableItemDefinition(7, "Rocket Launcher", "RocketLauncher", UnityEngine.InputSystem.Key.Digit7, "7"),
+        new SpawnableItemDefinition(8, "Landmine", "Landmine", UnityEngine.InputSystem.Key.Digit8, "8"),
+        new SpawnableItemDefinition(9, "Electromagnet", "Electromagnet", UnityEngine.InputSystem.Key.Digit9, "9"),
+        new SpawnableItemDefinition(10, "Orbital Laser", "OrbitalLaser", UnityEngine.InputSystem.Key.Digit0, "0"),
+        new SpawnableItemDefinition(11, "Rocket Driver", "RocketDriver", UnityEngine.InputSystem.Key.Minus, "-"),
+        new SpawnableItemDefinition(12, "Freeze Bomb", "FreezeBomb", UnityEngine.InputSystem.Key.Equals, "="),
+        new SpawnableItemDefinition(13, "Jumbo Burger", "JumboBurger", UnityEngine.InputSystem.Key.F6, "F6"),
+        new SpawnableItemDefinition(14, "Flash Camera", "FlashCamera", UnityEngine.InputSystem.Key.F7, "F7"),
+        new SpawnableItemDefinition(15, "Smoke Bomb", "SmokeBomb", UnityEngine.InputSystem.Key.F8, "F8"),
+        new SpawnableItemDefinition(16, "Rail Gun", "Railgun", UnityEngine.InputSystem.Key.F9, "F9"),
+        new SpawnableItemDefinition(17, "Thunderstorm", "Thunderstorm", UnityEngine.InputSystem.Key.F10, "F10"),
     };
 
     // ── reflection cache ────────────────────────────────────────────────────
@@ -329,7 +292,9 @@ public partial class BirdieMod
 
         try
         {
-            UnityEngine.Object[] dispensers = UnityEngine.Object.FindObjectsOfType(cachedItemDispenserType);
+            UnityEngine.Object[] dispensers = UnityEngine.Object.FindObjectsByType(
+                cachedItemDispenserType,
+                FindObjectsSortMode.InstanceID);
             for (int i = 0; i < dispensers.Length; i++)
             {
                 Component dispenser = dispensers[i] as Component;
@@ -374,7 +339,9 @@ public partial class BirdieMod
 
         try
         {
-            UnityEngine.Object[] items = UnityEngine.Object.FindObjectsOfType(cachedPhysicalItemType);
+            UnityEngine.Object[] items = UnityEngine.Object.FindObjectsByType(
+                cachedPhysicalItemType,
+                FindObjectsSortMode.InstanceID);
             for (int i = 0; i < items.Length; i++)
             {
                 Component item = items[i] as Component;
@@ -581,7 +548,7 @@ public partial class BirdieMod
         if (itemTypeInt <= 0)
         {
             // Fallback: pick a random item from the mod's spawnable list.
-            itemTypeInt = SpawnableItemTypeInts[UnityEngine.Random.Range(0, SpawnableItemTypeInts.Length)];
+            itemTypeInt = SpawnableItems[UnityEngine.Random.Range(0, SpawnableItems.Length)].TypeId;
             itemTypeInt = ResolveSpawnableItemTypeInt(itemTypeInt);
             if (itemTypeInt <= 0)
             {
@@ -688,8 +655,8 @@ public partial class BirdieMod
         // Tier 1 — BirdieGrantBridge (no teleport needed).
         if (BirdieGrantBridge.IsReady())
         {
-            int itemTypeInt = SpawnableItemTypeInts[
-                UnityEngine.Random.Range(0, SpawnableItemTypeInts.Length)];
+            int itemTypeInt = SpawnableItems[
+                UnityEngine.Random.Range(0, SpawnableItems.Length)].TypeId;
             itemTypeInt = ResolveSpawnableItemTypeInt(itemTypeInt);
             if (itemTypeInt <= 0)
             {
@@ -750,7 +717,9 @@ public partial class BirdieMod
 
         try
         {
-            UnityEngine.Object[] spawners = UnityEngine.Object.FindObjectsOfType(cachedItemSpawnerType);
+            UnityEngine.Object[] spawners = UnityEngine.Object.FindObjectsByType(
+                cachedItemSpawnerType,
+                FindObjectsSortMode.None);
             Component nearestSpawner = null;
             float nearestDistanceSquared = float.MaxValue;
 
@@ -846,8 +815,8 @@ public partial class BirdieMod
     // must not be assumed by the mod.
     private int ResolveSpawnableItemTypeInt(int itemTypeInt)
     {
-        int index = Array.IndexOf(SpawnableItemTypeInts, itemTypeInt);
-        if (index < 0)
+        SpawnableItemDefinition item = FindSpawnableItem(itemTypeInt);
+        if (item.TypeId == 0)
         {
             return itemTypeInt;
         }
@@ -860,12 +829,12 @@ public partial class BirdieMod
 
         try
         {
-            object itemTypeValue = Enum.Parse(cachedItemTypeEnumType, SpawnableItemEnumNames[index], true);
+            object itemTypeValue = Enum.Parse(cachedItemTypeEnumType, item.EnumName, true);
             return Convert.ToInt32(itemTypeValue);
         }
         catch
         {
-            BirdieLog.Warning("[Birdie] Item spawner: " + SpawnableItemNames[index] + " is not available in this game version.");
+            BirdieLog.Warning("[Birdie] Item spawner: " + item.DisplayName + " is not available in this game version.");
             return 0;
         }
     }
@@ -1065,12 +1034,25 @@ public partial class BirdieMod
     // Converts an ItemType int value to the display name used in log messages.
     private string ItemIndexToName(int itemTypeInt)
     {
-        int arrayIndex = itemTypeInt - 1;
-        if (arrayIndex >= 0 && arrayIndex < SpawnableItemNames.Length)
+        SpawnableItemDefinition item = FindSpawnableItem(itemTypeInt);
+        if (item.TypeId != 0)
         {
-            return SpawnableItemNames[arrayIndex];
+            return item.DisplayName;
         }
 
         return "item #" + itemTypeInt;
+    }
+
+    private SpawnableItemDefinition FindSpawnableItem(int itemTypeInt)
+    {
+        for (int i = 0; i < SpawnableItems.Length; i++)
+        {
+            if (SpawnableItems[i].TypeId == itemTypeInt)
+            {
+                return SpawnableItems[i];
+            }
+        }
+
+        return default(SpawnableItemDefinition);
     }
 }

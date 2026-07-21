@@ -47,6 +47,10 @@ public partial class BirdieMod
     private Texture2D   _imTxSeparator;
     private Texture2D   _imTxPanel;
     private Texture2D   _imTxAccentHover;
+    private Texture2D   _imTxBackdrop;
+    private Texture2D   _imTxCard;
+    private Texture2D   _imTxCyan;
+    private Texture2D   _imTxCyanHover;
 
     private static Texture2D MakeTex(Color c)
     {
@@ -56,66 +60,90 @@ public partial class BirdieMod
         return t;
     }
 
+    // A tiny 9-sliced rounded texture gives the IMGUI controls the same soft
+    // card treatment as the in-game WAND menu, without requiring external art.
+    private static Texture2D MakeRoundedTex(Color c, int radius)
+    {
+        const int size = 32;
+        Texture2D t = new Texture2D(size, size);
+        float r = Mathf.Max(1f, radius);
+        for (int y = 0; y < size; y++)
+        for (int x = 0; x < size; x++)
+        {
+            float dx = Mathf.Max(r - x, x - (size - 1 - r), 0f);
+            float dy = Mathf.Max(r - y, y - (size - 1 - r), 0f);
+            Color pixel = c;
+            if (dx * dx + dy * dy > r * r) pixel.a = 0f;
+            t.SetPixel(x, y, pixel);
+        }
+        t.Apply();
+        return t;
+    }
+
     private void InitImStyles()
     {
         if (_imStylesReady) return;
         _imStylesReady = true;
 
-        _imTxDark        = MakeTex(new Color(0.055f, 0.070f, 0.105f, 0.985f));
-        _imTxBlue        = MakeTex(new Color(0.12f, 0.56f, 0.86f, 1.00f));
-        _imTxAccentHover = MakeTex(new Color(0.16f, 0.42f, 0.65f, 1.00f));
-        _imTxGrey        = MakeTex(new Color(0.13f, 0.16f, 0.23f, 1.00f));
-        _imTxDarker      = MakeTex(new Color(0.035f, 0.047f, 0.075f, 1.00f));
-        _imTxPanel       = MakeTex(new Color(0.085f, 0.105f, 0.155f, 0.92f));
-        _imTxRed         = MakeTex(new Color(0.72f, 0.20f, 0.28f, 1.00f));
-        _imTxGreen       = MakeTex(new Color(0.13f, 0.62f, 0.42f, 1.00f));
-        _imTxSeparator   = MakeTex(new Color(0.60f, 0.80f, 1f, 0.12f));
+        _imTxDark        = MakeRoundedTex(new Color(0.035f, 0.043f, 0.055f, 0.985f), 11);
+        _imTxBlue        = MakeRoundedTex(new Color(0.00f, 0.62f, 0.79f, 1.00f), 8);
+        _imTxAccentHover = MakeRoundedTex(new Color(0.00f, 0.72f, 0.90f, 1.00f), 8);
+        _imTxGrey        = MakeRoundedTex(new Color(0.105f, 0.118f, 0.137f, 1.00f), 8);
+        _imTxDarker      = MakeTex(new Color(0.027f, 0.031f, 0.040f, 0.98f));
+        _imTxPanel       = MakeRoundedTex(new Color(0.055f, 0.062f, 0.075f, 0.96f), 12);
+        _imTxCard        = MakeRoundedTex(new Color(0.070f, 0.078f, 0.094f, 0.92f), 10);
+        _imTxBackdrop    = MakeTex(new Color(0f, 0f, 0f, 0.64f));
+        _imTxCyan        = MakeRoundedTex(new Color(0.00f, 0.66f, 0.84f, 1f), 8);
+        _imTxCyanHover   = MakeRoundedTex(new Color(0.08f, 0.76f, 0.94f, 1f), 8);
+        _imTxRed         = MakeRoundedTex(new Color(0.78f, 0.20f, 0.27f, 1.00f), 8);
+        _imTxGreen       = MakeRoundedTex(new Color(0.13f, 0.70f, 0.43f, 1.00f), 8);
+        _imTxSeparator   = MakeTex(new Color(1f, 1f, 1f, 0.08f));
 
         _imWindowStyle = new GUIStyle(GUI.skin.window);
         _imWindowStyle.normal.background   = _imTxDark;
         _imWindowStyle.onNormal.background = _imTxDark;
-        _imWindowStyle.border   = new RectOffset(4, 4, 4, 4);
+        _imWindowStyle.border   = new RectOffset(11, 11, 11, 11);
         _imWindowStyle.padding  = new RectOffset(0, 0, 0, 0);
         _imWindowStyle.normal.textColor = Color.clear;   // hide default title
 
         _imTitleStyle = new GUIStyle(GUI.skin.label);
-        _imTitleStyle.fontSize  = 17;
+        _imTitleStyle.fontSize  = 21;
         _imTitleStyle.fontStyle = FontStyle.Bold;
         _imTitleStyle.normal.textColor = Color.white;
         _imTitleStyle.alignment = TextAnchor.MiddleLeft;
 
         _imTabActive = new GUIStyle(GUI.skin.button);
-        _imTabActive.normal.background   = _imTxBlue;
+        _imTabActive.normal.background   = _imTxCyan;
         _imTabActive.hover.background    = _imTxAccentHover;
         _imTabActive.active.background   = _imTxBlue;
         _imTabActive.normal.textColor    = Color.white;
         _imTabActive.fontStyle           = FontStyle.Bold;
-        _imTabActive.fontSize            = 12;
-        _imTabActive.alignment           = TextAnchor.MiddleLeft;
-        _imTabActive.padding             = new RectOffset(14, 8, 0, 0);
+        _imTabActive.fontSize            = 11;
+        _imTabActive.alignment           = TextAnchor.MiddleCenter;
+        _imTabActive.padding             = new RectOffset(8, 8, 0, 0);
 
         _imTabIdle = new GUIStyle(GUI.skin.button);
-        _imTabIdle.normal.background  = _imTxDarker;
+        _imTabIdle.normal.background  = _imTxCard;
         _imTabIdle.hover.background   = _imTxGrey;
         _imTabIdle.active.background  = _imTxGrey;
         _imTabIdle.normal.textColor   = new Color(0.70f, 0.70f, 0.75f);
-        _imTabIdle.fontSize           = 12;
-        _imTabIdle.alignment          = TextAnchor.MiddleLeft;
-        _imTabIdle.padding            = new RectOffset(14, 8, 0, 0);
+        _imTabIdle.fontSize           = 11;
+        _imTabIdle.alignment          = TextAnchor.MiddleCenter;
+        _imTabIdle.padding            = new RectOffset(8, 8, 0, 0);
 
         _imSectionLabel = new GUIStyle(GUI.skin.label);
-        _imSectionLabel.fontSize  = 11;
+        _imSectionLabel.fontSize  = 12;
         _imSectionLabel.fontStyle = FontStyle.Bold;
-        _imSectionLabel.normal.textColor = new Color(0.35f, 0.75f, 1.00f);
+        _imSectionLabel.normal.textColor = new Color(0.70f, 0.74f, 0.78f);
 
         _imActionLabel = new GUIStyle(GUI.skin.label);
-        _imActionLabel.fontSize = 14;
-        _imActionLabel.normal.textColor = Color.white;
+        _imActionLabel.fontSize = 15;
+        _imActionLabel.normal.textColor = new Color(0.90f, 0.91f, 0.93f);
         _imActionLabel.alignment = TextAnchor.MiddleLeft;
 
         _imToggleOn = new GUIStyle(GUI.skin.button);
-        _imToggleOn.normal.background = _imTxBlue;
-        _imToggleOn.hover.background  = _imTxAccentHover;
+        _imToggleOn.normal.background = _imTxCyan;
+        _imToggleOn.hover.background  = _imTxCyanHover;
         _imToggleOn.normal.textColor  = Color.white;
         _imToggleOn.fontSize          = 11;
         _imToggleOn.fontStyle         = FontStyle.Bold;
@@ -127,7 +155,7 @@ public partial class BirdieMod
         _imToggleOff.fontSize          = 11;
 
         _imKeyBadge = new GUIStyle(GUI.skin.button);
-        _imKeyBadge.normal.background = _imTxBlue;
+        _imKeyBadge.normal.background = _imTxGrey;
         _imKeyBadge.hover.background  = _imTxGrey;
         _imKeyBadge.normal.textColor  = Color.white;
         _imKeyBadge.fontSize          = 11;
@@ -137,8 +165,8 @@ public partial class BirdieMod
         _imRebindActive.hover.background  = _imTxGreen;
 
         _imButton = new GUIStyle(GUI.skin.button);
-        _imButton.normal.background = _imTxGrey;
-        _imButton.hover.background  = _imTxAccentHover;
+        _imButton.normal.background = _imTxCyan;
+        _imButton.hover.background  = _imTxCyanHover;
         _imButton.normal.textColor  = Color.white;
         _imButton.fontSize          = 13;
 
@@ -152,12 +180,12 @@ public partial class BirdieMod
         _imInfoLabel = new GUIStyle(GUI.skin.label);
         _imInfoLabel.fontSize  = 12;
         _imInfoLabel.wordWrap  = true;
-        _imInfoLabel.normal.textColor = new Color(0.67f, 0.73f, 0.84f);
+        _imInfoLabel.normal.textColor = new Color(0.62f, 0.66f, 0.71f);
 
         _imDescLabel = new GUIStyle(GUI.skin.label);
         _imDescLabel.fontSize  = 10;
         _imDescLabel.wordWrap  = false;
-        _imDescLabel.normal.textColor = new Color(0.50f, 0.60f, 0.73f);
+        _imDescLabel.normal.textColor = new Color(0.51f, 0.56f, 0.62f);
     }
 
     // ── OnGUI (called from entry shim) ───────────────────────────────────────
@@ -170,8 +198,8 @@ public partial class BirdieMod
 
         if (!_imRectInit)
         {
-            float width = Mathf.Min(920f, Mathf.Max(560f, Screen.width - 40f));
-            float height = Mathf.Min(620f, Mathf.Max(460f, Screen.height - 40f));
+            float width = Mathf.Min(1420f, Mathf.Max(720f, Screen.width - 48f));
+            float height = Mathf.Min(820f, Mathf.Max(500f, Screen.height - 72f));
             _imRect = new Rect(
                 (Screen.width - width) * 0.5f,
                 (Screen.height - height) * 0.5f,
@@ -182,6 +210,7 @@ public partial class BirdieMod
         _imRect.x = Mathf.Clamp(_imRect.x, 0f, Mathf.Max(0f, Screen.width - _imRect.width));
         _imRect.y = Mathf.Clamp(_imRect.y, 0f, Mathf.Max(0f, Screen.height - _imRect.height));
 
+        GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), _imTxBackdrop);
         _imRect = GUI.Window(9901, _imRect, DrawImWindow, string.Empty, _imWindowStyle);
     }
 
@@ -191,40 +220,37 @@ public partial class BirdieMod
     {
         float w = _imRect.width;
         float h = _imRect.height;
-        float sideW = 178f;
-        float titleH = 64f;
+        float titleH = 92f;
 
         // ── Title bar ──────────────────────────────────────────────────────
         GUI.DrawTexture(new Rect(0, 0, w, titleH), _imTxDarker);
-        GUI.Label(new Rect(18f, 8f, w - 190f, 26f), "BIRDIE MOD", _imTitleStyle);
-        GUI.Label(new Rect(19f, 34f, w - 190f, 20f), GetImTabTitle(settingsTabIndex) + "  ·  " + settingsKeyLabel + " toggle  ·  Esc close", _imInfoLabel);
+        GUI.Label(new Rect(26f, 12f, w - 210f, 30f), "BIRDIE MOD", _imTitleStyle);
+        GUI.Label(new Rect(27f, 42f, w - 210f, 20f), GetImTabTitle(settingsTabIndex) + "  ·  " + settingsKeyLabel + " — открыть/закрыть  ·  Esc — закрыть", _imInfoLabel);
 
-        if (GUI.Button(new Rect(w - 42f, 16f, 26f, 26f), "X", _imCloseBtn))
+        if (GUI.Button(new Rect(w - 54f, 17f, 32f, 30f), "X", _imCloseBtn))
             CloseRosettaSettings();
 
         // thin separator below title
         GUI.DrawTexture(new Rect(0, titleH, w, 1f), _imTxSeparator);
 
-        // ── Sidebar ────────────────────────────────────────────────────────
-        GUI.DrawTexture(new Rect(0, titleH + 1f, sideW, h - titleH - 1f), _imTxDarker);
-        GUI.DrawTexture(new Rect(sideW, titleH + 1f, 1f, h - titleH - 1f), _imTxSeparator);
-
-        string[] tabLabels = { "FEATURES", "KEYBINDS", "HUD & OVERLAY", "CREDITS", "ITEM SPAWNER", "WEATHER" };
-        float tabH = 46f;
+        string[] tabLabels = { "FEATURES", "KEYBINDS", "HUD", "CREDITS", "ITEMS", "WEATHER" };
+        float tabH = 30f;
+        float tabGap = 8f;
+        float tabW = (w - 52f - tabGap * (tabLabels.Length - 1)) / tabLabels.Length;
         for (int i = 0; i < tabLabels.Length; i++)
         {
             GUIStyle s = (settingsTabIndex == i) ? _imTabActive : _imTabIdle;
-            if (GUI.Button(new Rect(8f, titleH + 12f + i * (tabH + 5f), sideW - 16f, tabH), tabLabels[i], s))
+            if (GUI.Button(new Rect(26f + i * (tabW + tabGap), 58f, tabW, tabH), tabLabels[i], s))
                 settingsTabIndex = i;
         }
 
         // ── Content area ───────────────────────────────────────────────────
-        float cx = sideW + 16f;
-        float cy = titleH + 14f;
-        float cw = w - sideW - 30f;
-        float ch = h - cy - 14f;
+        float cx = 20f;
+        float cy = titleH + 16f;
+        float cw = w - 40f;
+        float ch = h - cy - 20f;
 
-        GUI.DrawTexture(new Rect(cx - 8f, cy - 8f, cw + 16f, ch + 16f), _imTxPanel);
+        GUI.DrawTexture(new Rect(cx - 6f, cy - 6f, cw + 12f, ch + 12f), _imTxPanel);
 
         GUILayout.BeginArea(new Rect(cx, cy, cw, ch));
         switch (settingsTabIndex)
@@ -382,16 +408,17 @@ public partial class BirdieMod
         _imItemsScroll = GUILayout.BeginScrollView(_imItemsScroll);
 
         float btnW = (w - 12f) * 0.5f;
-        for (int i = 0; i < SpawnableItemNames.Length; i++)
+        for (int i = 0; i < SpawnableItems.Length; i++)
         {
             if (i % 2 == 0) GUILayout.BeginHorizontal();
-            int captured = SpawnableItemTypeInts[i];
-            string lbl = SpawnableItemKeyLabels[i] + "  " + SpawnableItemNames[i];
+            SpawnableItemDefinition item = SpawnableItems[i];
+            int captured = item.TypeId;
+            string lbl = item.KeyLabel + "  " + item.DisplayName;
             if (GUILayout.Button(lbl, _imButton, GUILayout.Width(btnW), GUILayout.Height(30f)))
             {
                 SpawnItemClientSide(captured);
             }
-            if (i % 2 == 1 || i == SpawnableItemNames.Length - 1) GUILayout.EndHorizontal();
+            if (i % 2 == 1 || i == SpawnableItems.Length - 1) GUILayout.EndHorizontal();
             if (i % 2 == 1) GUILayout.Space(2f);
         }
 

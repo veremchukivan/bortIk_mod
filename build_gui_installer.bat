@@ -53,11 +53,11 @@ if errorlevel 1 (
 )
 
 echo [1/2] Building gfModInstaller.exe...
-"%CSC_PATH%" /nologo /target:winexe /optimize+ /debug:pdbonly /pdb:"Installer\gfModInstaller.pdb" /out:"Installer\gfModInstaller.exe" /resource:"Installer\PayloadBundle.zip",gfMod.PayloadBundle.zip /reference:System.dll /reference:System.Core.dll /reference:System.Drawing.dll /reference:System.Windows.Forms.dll /reference:System.IO.Compression.dll /reference:System.IO.Compression.FileSystem.dll "Installer\BirdieModInstaller.cs"
+"%CSC_PATH%" /nologo /target:winexe /optimize+ /debug:pdbonly /pdb:"Installer\gfModInstaller.pdb" /out:"Installer\gfModInstaller.exe" /resource:"Installer\PayloadBundle.zip",gfMod.PayloadBundle.zip /reference:System.dll /reference:System.Core.dll /reference:System.Drawing.dll /reference:System.Windows.Forms.dll /reference:System.IO.Compression.dll /reference:System.IO.Compression.FileSystem.dll "Installer\gfModInstaller.cs"
 if errorlevel 1 exit /b 1
 
 echo [2/2] Building gfModUninstaller.exe...
-"%CSC_PATH%" /nologo /target:winexe /optimize+ /debug:pdbonly /pdb:"Installer\gfModUninstaller.pdb" /out:"Installer\gfModUninstaller.exe" /reference:System.dll /reference:System.Core.dll /reference:System.Drawing.dll /reference:System.Windows.Forms.dll "Installer\BirdieModUninstaller.cs"
+"%CSC_PATH%" /nologo /target:winexe /optimize+ /debug:pdbonly /pdb:"Installer\gfModUninstaller.pdb" /out:"Installer\gfModUninstaller.exe" /reference:System.dll /reference:System.Core.dll /reference:System.Drawing.dll /reference:System.Windows.Forms.dll "Installer\gfModUninstaller.cs"
 if errorlevel 1 exit /b 1
 
 if not exist "Release" mkdir "Release"

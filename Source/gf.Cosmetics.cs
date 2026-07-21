@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-public partial class BirdieMod
+public partial class GfMod
 {
     private readonly string[] cosmeticUnlockFlagNames = new string[]
     {
@@ -79,20 +79,20 @@ public partial class BirdieMod
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Cosmetic unlock failed: " + ex.Message);
+            GfLog.Warning("[Gf] Cosmetic unlock failed: " + ex.Message);
         }
 
         if (anyFlagApplied)
         {
-            BirdieLog.Msg("[Birdie] Cosmetics unlock applied.");
+            GfLog.Msg("[Gf] Cosmetics unlock applied.");
         }
         else if (anyRefreshInvoked)
         {
-            BirdieLog.Msg("[Birdie] Cosmetics UI refresh triggered.");
+            GfLog.Msg("[Gf] Cosmetics UI refresh triggered.");
         }
         else
         {
-            BirdieLog.Warning("[Birdie] Cosmetics manager not found.");
+            GfLog.Warning("[Gf] Cosmetics manager not found.");
         }
     }
 

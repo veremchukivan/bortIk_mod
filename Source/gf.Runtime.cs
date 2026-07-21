@@ -1,15 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public partial class BirdieMod
+public partial class GfMod
 {
-    internal void BirdieInit()
+    internal void GfInit()
     {
         LoadOrCreateConfig();
         WeatherSystemInit();
     }
 
-    internal void BirdieUpdate()
+    internal void GfUpdate()
     {
         float currentTime = Time.time;
 
@@ -17,8 +17,8 @@ public partial class BirdieMod
         // handler is registered on the host before any client sends a request.
         // EnsureInitialized is idempotent — after the first run it returns
         // immediately with a single bool check.
-        BirdieGrantBridge.EnsureInitialized();
-        BirdieWeatherBridge.EnsureHandlersRegistered();
+        GfGrantBridge.EnsureInitialized();
+        GfWeatherBridge.EnsureHandlersRegistered();
         WeatherSystemUpdate();
 
         PollDispenserPickup();
@@ -50,7 +50,7 @@ public partial class BirdieMod
 
     }
 
-    internal void BirdieLateUpdate()
+    internal void GfLateUpdate()
     {
         TickInfiniteAmmo();
         TickNoKnockback();

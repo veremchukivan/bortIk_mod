@@ -24,10 +24,10 @@ using UnityEngine;
 //    It reads weatherType and weatherAllowed, then updates ReceivedWeatherType,
 //    WeatherAllowedByHost, and ReceivedNewWeather accordingly.
 
-internal static class BirdieWeatherBridge
+internal static class GfWeatherBridge
 {
     private const string RpcMethodName =
-        "System.Void PlayerInventory::BirdieCmdSyncWeather(System.Byte,System.Boolean)";
+        "System.Void PlayerInventory::GfCmdSyncWeather(System.Byte,System.Boolean)";
 
     // ── public state ─────────────────────────────────────────────────────────
 
@@ -92,7 +92,7 @@ internal static class BirdieWeatherBridge
         {
             if (!CollectReflectionCaches())
             {
-                BirdieLog.Warning("[Birdie] Weather bridge: Mirror reflection incomplete — weather broadcast unavailable.");
+                GfLog.Warning("[Gf] Weather bridge: Mirror reflection incomplete — weather broadcast unavailable.");
                 return;
             }
 
@@ -100,7 +100,7 @@ internal static class BirdieWeatherBridge
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Weather bridge init: " + ex.Message);
+            GfLog.Warning("[Gf] Weather bridge init: " + ex.Message);
         }
     }
 
@@ -121,14 +121,14 @@ internal static class BirdieWeatherBridge
                     BindingFlags.Public | BindingFlags.Static);
                 if (activeProp != null && !(bool)activeProp.GetValue(null, null))
                 {
-                    BirdieLog.Warning("[Birdie] Weather bridge: NetworkServer is not active — cannot broadcast.");
+                    GfLog.Warning("[Gf] Weather bridge: NetworkServer is not active — cannot broadcast.");
                     return;
                 }
             }
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Weather bridge (server check): " + ex.Message);
+            GfLog.Warning("[Gf] Weather bridge (server check): " + ex.Message);
             return;
         }
 
@@ -144,7 +144,7 @@ internal static class BirdieWeatherBridge
             mirrorWriterToArraySegment == null ||
             cachedLocalPlayerInventoryProperty == null)
         {
-            BirdieLog.Warning("[Birdie] Weather bridge: broadcast not ready (reflection incomplete).");
+            GfLog.Warning("[Gf] Weather bridge: broadcast not ready (reflection incomplete).");
             return;
         }
 
@@ -154,7 +154,7 @@ internal static class BirdieWeatherBridge
             Component inventory = cachedLocalPlayerInventoryProperty.GetValue(null, null) as Component;
             if (inventory == null)
             {
-                BirdieLog.Warning("[Birdie] Weather bridge: LocalPlayerInventory is null.");
+                GfLog.Warning("[Gf] Weather bridge: LocalPlayerInventory is null.");
                 return;
             }
 
@@ -180,7 +180,7 @@ internal static class BirdieWeatherBridge
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Weather bridge (broadcast): " + ex.Message);
+            GfLog.Warning("[Gf] Weather bridge (broadcast): " + ex.Message);
         }
         finally
         {
@@ -213,7 +213,7 @@ internal static class BirdieWeatherBridge
 
             if (mirrorReaderExtReadByte == null || mirrorReaderExtReadBool == null)
             {
-                BirdieLog.Warning("[Birdie] Weather bridge client handler: reflection incomplete.");
+                GfLog.Warning("[Gf] Weather bridge client handler: reflection incomplete.");
                 return;
             }
 
@@ -224,11 +224,11 @@ internal static class BirdieWeatherBridge
             WeatherAllowedByHost = weatherAllowed;
             ReceivedNewWeather = true;
 
-            BirdieLog.Msg("[Birdie] Weather bridge: weatherType=" + weatherType + " weatherAllowed=" + weatherAllowed);
+            GfLog.Msg("[Gf] Weather bridge: weatherType=" + weatherType + " weatherAllowed=" + weatherAllowed);
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Weather bridge client handler: " + ex.Message);
+            GfLog.Warning("[Gf] Weather bridge client handler: " + ex.Message);
         }
     }
 
@@ -398,7 +398,7 @@ internal static class BirdieWeatherBridge
 
         if (playerInventoryType == null)
         {
-            BirdieLog.Warning("[Birdie] Weather bridge: PlayerInventory type not found.");
+            GfLog.Warning("[Gf] Weather bridge: PlayerInventory type not found.");
             return;
         }
 
@@ -406,19 +406,19 @@ internal static class BirdieWeatherBridge
         //   void(Mirror.NetworkBehaviour, Mirror.NetworkReader, Mirror.NetworkConnectionToClient)
         // The method forwards its args (as object) to ClientHandleSyncWeather.
         DynamicMethod dm = new DynamicMethod(
-            "BirdieWeatherRpcHandler",
+            "GfWeatherRpcHandler",
             typeof(void),
             new Type[] { mirrorNbType, mirrorReaderType, mirrorConnType },
-            typeof(BirdieWeatherBridge).Module,
+            typeof(GfWeatherBridge).Module,
             skipVisibility: true);
 
-        MethodInfo handlerMethod = typeof(BirdieWeatherBridge).GetMethod(
+        MethodInfo handlerMethod = typeof(GfWeatherBridge).GetMethod(
             "ClientHandleSyncWeather",
             BindingFlags.Static | BindingFlags.NonPublic);
 
         if (handlerMethod == null)
         {
-            BirdieLog.Warning("[Birdie] Weather bridge: ClientHandleSyncWeather not found via reflection.");
+            GfLog.Warning("[Gf] Weather bridge: ClientHandleSyncWeather not found via reflection.");
             return;
         }
 
@@ -444,7 +444,7 @@ internal static class BirdieWeatherBridge
 
         if (registeredRpcHash == 0)
         {
-            BirdieLog.Warning("[Birdie] Weather bridge: RegisterDelegate returned hash 0 — may indicate a collision.");
+            GfLog.Warning("[Gf] Weather bridge: RegisterDelegate returned hash 0 — may indicate a collision.");
         }
     }
 }

@@ -9,11 +9,11 @@ internal static class UninstallerProgram
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new BirdieModUninstallerForm());
+        Application.Run(new GfModUninstallerForm());
     }
 }
 
-internal sealed class BirdieModUninstallerForm : Form
+internal sealed class GfModUninstallerForm : Form
 {
     private const string GameExecutableName = "Super Battle Golf.exe";
     private const string BackupFolderName = ".gfmod_backup";
@@ -30,7 +30,7 @@ internal sealed class BirdieModUninstallerForm : Form
     private readonly Button uninstallButton;
     private readonly TextBox logTextBox;
 
-    internal BirdieModUninstallerForm()
+    internal GfModUninstallerForm()
     {
         Text = "gf Mod Uninstaller v1.0";
         FormBorderStyle = FormBorderStyle.FixedDialog;

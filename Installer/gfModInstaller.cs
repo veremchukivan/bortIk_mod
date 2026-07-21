@@ -11,11 +11,11 @@ internal static class Program
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new BirdieModInstallerForm());
+        Application.Run(new GfModInstallerForm());
     }
 }
 
-internal sealed class BirdieModInstallerForm : Form
+internal sealed class GfModInstallerForm : Form
 {
     private const string GameExecutableName = "Super Battle Golf.exe";
     private const string PayloadResourceName = "gfMod.PayloadBundle.zip";
@@ -37,7 +37,7 @@ internal sealed class BirdieModInstallerForm : Form
     private readonly Button installButton;
     private readonly TextBox logTextBox;
 
-    internal BirdieModInstallerForm()
+    internal GfModInstallerForm()
     {
         Text = "gf Mod Installer v1.0";
         FormBorderStyle = FormBorderStyle.FixedDialog;

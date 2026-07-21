@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-public partial class BirdieMod
+public partial class GfMod
 {
     private bool TryGetSwingChargeSettings(out float riseDuration, out float fullChargeTime, out float coyoteTime, out float maxNormalizedPower, out float minReleasePower)
     {

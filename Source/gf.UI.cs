@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public partial class BirdieMod
+public partial class GfMod
 {
     private void MarkHudDirty()
     {
@@ -38,7 +38,7 @@ public partial class BirdieMod
             return;
         }
 
-        hudCanvas = new GameObject("BirdieHudCanvas");
+        hudCanvas = new GameObject("GfHudCanvas");
         Canvas canvas = hudCanvas.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 10000;
@@ -52,7 +52,7 @@ public partial class BirdieMod
 
         leftHudText = CreateHudText(
             hudCanvas.transform,
-            "BirdieHudLeft",
+            "GfHudLeft",
             new Vector2(0f, 0.86f),
             new Vector2(0.28f, 1f),
             new Vector2(14f, -12f),
@@ -62,7 +62,7 @@ public partial class BirdieMod
 
         centerHudText = CreateHudText(
             hudCanvas.transform,
-            "BirdieHudCenter",
+            "GfHudCenter",
             new Vector2(0.5f, 1f),
             new Vector2(0.5f, 1f),
             new Vector2(-64f, -34f),
@@ -72,7 +72,7 @@ public partial class BirdieMod
 
         rightHudText = CreateHudText(
             hudCanvas.transform,
-            "BirdieHudRight",
+            "GfHudRight",
             new Vector2(0.72f, 0.86f),
             new Vector2(1f, 1f),
             new Vector2(14f, -12f),
@@ -82,7 +82,7 @@ public partial class BirdieMod
 
         bottomHudText = CreateHudText(
             hudCanvas.transform,
-            "BirdieHudBottom",
+            "GfHudBottom",
             new Vector2(0.5f, 0f),
             new Vector2(0.5f, 0f),
             new Vector2(-640f, 22f),
@@ -199,7 +199,7 @@ public partial class BirdieMod
             return "";
         }
 
-        return "<b><color=#FFB255>Birdie</color></b>";
+        return "<b><color=#FFB255>Gf</color></b>";
     }
 
     private string BuildRightHudText()
@@ -325,7 +325,7 @@ public partial class BirdieMod
     private void CreateActualTrailRenderer()
     {
         shotPathLine = CreateTrailRenderer(
-            "BirdieShotTrail", 0.06f, 0.04f, 10, 32760,
+            "GfShotTrail", 0.06f, 0.04f, 10, 32760,
             new Color(1f, 0.58f, 0.20f, 1f), 5000,
             out shotPathObject, out shotPathMaterial);
     }
@@ -333,7 +333,7 @@ public partial class BirdieMod
     private void CreatePredictedTrailRenderer()
     {
         predictedPathLine = CreateTrailRenderer(
-            "BirdiePredictedTrail", 0.03f, 0.02f, 8, 32759,
+            "GfPredictedTrail", 0.03f, 0.02f, 8, 32759,
             new Color(0.36f, 0.95f, 0.46f, 0.95f), 4999,
             out predictedPathObject, out predictedPathMaterial);
     }
@@ -341,7 +341,7 @@ public partial class BirdieMod
     private void CreateFrozenTrailRenderer()
     {
         frozenPredictedPathLine = CreateTrailRenderer(
-            "BirdieFrozenTrail", 0.034f, 0.024f, 8, 32758,
+            "GfFrozenTrail", 0.034f, 0.024f, 8, 32758,
             new Color(0.36f, 0.74f, 1f, 0.92f), 4998,
             out frozenPredictedPathObject, out frozenPredictedPathMaterial);
     }
@@ -532,7 +532,7 @@ public partial class BirdieMod
             return;
         }
 
-        itemMenuPanelObject = new GameObject("BirdieItemMenuPanel");
+        itemMenuPanelObject = new GameObject("GfItemMenuPanel");
         itemMenuPanelObject.transform.SetParent(parent, false);
 
         // Semi-transparent dark background, centered on screen.
@@ -547,7 +547,7 @@ public partial class BirdieMod
         background.color = new Color(0.035f, 0.055f, 0.095f, 0.97f);
 
         // Single text object inside the panel.
-        GameObject textObject = new GameObject("BirdieItemMenuText");
+        GameObject textObject = new GameObject("GfItemMenuText");
         textObject.transform.SetParent(itemMenuPanelObject.transform, false);
 
         RectTransform textRect = textObject.AddComponent<RectTransform>();
@@ -624,7 +624,7 @@ public partial class BirdieMod
         {
             if (UnityEngine.EventSystems.EventSystem.current == null)
             {
-                GameObject eventSystemObj = new GameObject("BirdieEventSystem");
+                GameObject eventSystemObj = new GameObject("GfEventSystem");
                 eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
                 // Use StandaloneInputModule as fallback (game has InputSystemUIInputModule already)
                 eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();

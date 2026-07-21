@@ -1,22 +1,22 @@
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(BirdieMod), "gf Mod", "1.2.0", "Cb12438")]
+[assembly: MelonInfo(typeof(GfMod), "gf Mod", "1.2.0", "Cb12438")]
 [assembly: MelonGame]
 
 // MelonLoader entry point — compiled only in the MelonLoader build.
-// Wires BirdieLog / BirdieCoroutine and bridges Unity lifecycle methods.
-public partial class BirdieMod : MelonMod
+// Wires GfLog / GfCoroutine and bridges Unity lifecycle methods.
+public partial class GfMod : MelonMod
 {
     [System.Obsolete]
     public override void OnApplicationStart()
     {
-        BirdieLog.MsgImpl  = s => MelonLogger.Msg(s);
-        BirdieLog.WarnImpl = s => MelonLogger.Warning(s);
-        BirdieCoroutine.StartImpl = e => MelonCoroutines.Start(e);
-        BirdieInit();
+        GfLog.MsgImpl  = s => MelonLogger.Msg(s);
+        GfLog.WarnImpl = s => MelonLogger.Warning(s);
+        GfCoroutine.StartImpl = e => MelonCoroutines.Start(e);
+        GfInit();
     }
 
-    public override void OnUpdate()     => BirdieUpdate();
-    public override void OnLateUpdate() => BirdieLateUpdate();
-    public override void OnGUI()        => BirdieOnGUI();
+    public override void OnUpdate()     => GfUpdate();
+    public override void OnLateUpdate() => GfLateUpdate();
+    public override void OnGUI()        => GfOnGUI();
 }

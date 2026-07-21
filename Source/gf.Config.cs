@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public partial class BirdieMod
+public partial class GfMod
 {
     private void LoadOrCreateConfig()
     {
@@ -212,7 +212,7 @@ public partial class BirdieMod
     private string BuildDefaultConfigText()
     {
         StringBuilder builder = new StringBuilder(512);
-        builder.AppendLine("# Birdie Mod config");
+        builder.AppendLine("# Gf Mod config");
         builder.AppendLine("# Restart the game after editing this file for trail/visual settings.");
         builder.AppendLine("# Keybind and HUD changes can also be made in-game via the settings panel (`).");
         builder.AppendLine();
@@ -379,7 +379,7 @@ public partial class BirdieMod
     private string BuildCurrentConfigText()
     {
         StringBuilder builder = new StringBuilder(1024);
-        builder.AppendLine("# Birdie Mod config");
+        builder.AppendLine("# Gf Mod config");
         builder.AppendLine("# Restart the game after editing this file for trail/visual settings.");
         builder.AppendLine("# Keybind and HUD changes can also be made in-game via the settings panel.");
         builder.AppendLine();

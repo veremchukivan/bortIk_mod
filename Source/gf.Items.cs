@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Reflection;
 using UnityEngine;
 
-public partial class BirdieMod
+public partial class GfMod
 {
     // Coffee is the only item type with a matching ItemDispenser in every scene.
-    // All other items require host access or the BirdieGrantBridge fallback.
+    // All other items require host access or the GfGrantBridge fallback.
     private const int CoffeeItemTypeInt = 1;
 
     private struct SpawnableItemDefinition
@@ -380,7 +380,7 @@ public partial class BirdieMod
 
         if (Time.time > dispenserPickupDeadline)
         {
-            BirdieLog.Warning("[Birdie] Item spawner (dispenser): timed out waiting for spawned item.");
+            GfLog.Warning("[Gf] Item spawner (dispenser): timed out waiting for spawned item.");
             dispenserPickupPending = false;
             dispenserPickupLocalInventory = null;
             return;
@@ -396,7 +396,7 @@ public partial class BirdieMod
 
         if (cachedCmdGiveToPlayerMethod == null || dispenserPickupLocalInventory == null)
         {
-            BirdieLog.Warning("[Birdie] Item spawner (dispenser): CmdGiveToPlayer reflection not ready.");
+            GfLog.Warning("[Gf] Item spawner (dispenser): CmdGiveToPlayer reflection not ready.");
             dispenserPickupLocalInventory = null;
             return;
         }
@@ -407,7 +407,7 @@ public partial class BirdieMod
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Item spawner (dispenser pickup): " + ex.Message);
+            GfLog.Warning("[Gf] Item spawner (dispenser pickup): " + ex.Message);
         }
 
         dispenserPickupLocalInventory = null;
@@ -506,7 +506,7 @@ public partial class BirdieMod
         Component localInventory = cachedLocalPlayerInventoryProperty.GetValue(null, null) as Component;
         if (localInventory == null)
         {
-            BirdieLog.Warning("[Birdie] Crate: local player inventory not found.");
+            GfLog.Warning("[Gf] Crate: local player inventory not found.");
             return;
         }
 
@@ -527,7 +527,7 @@ public partial class BirdieMod
     {
         if (cachedItemSpawnerType == null)
         {
-            BirdieLog.Warning("[Birdie] Crate: ItemSpawner type not found.");
+            GfLog.Warning("[Gf] Crate: ItemSpawner type not found.");
             return;
         }
 
@@ -539,7 +539,7 @@ public partial class BirdieMod
 
         if (nearestSpawner == null)
         {
-            BirdieLog.Warning("[Birdie] Crate: no item crate with an available box found.");
+            GfLog.Warning("[Gf] Crate: no item crate with an available box found.");
             return;
         }
 
@@ -558,7 +558,7 @@ public partial class BirdieMod
 
         if (cachedServerTryAddItemMethod == null || cachedItemTypeEnumType == null)
         {
-            BirdieLog.Warning("[Birdie] Crate: ServerTryAddItem reflection not ready.");
+            GfLog.Warning("[Gf] Crate: ServerTryAddItem reflection not ready.");
             return;
         }
 
@@ -577,13 +577,13 @@ public partial class BirdieMod
 
             if (!added)
             {
-                BirdieLog.Warning("[Birdie] Crate: inventory full.");
+                GfLog.Warning("[Gf] Crate: inventory full.");
                 return;
             }
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Crate (host grant): " + ex.Message);
+            GfLog.Warning("[Gf] Crate (host grant): " + ex.Message);
             return;
         }
 
@@ -640,7 +640,7 @@ public partial class BirdieMod
     }
 
     // Client path:
-    //   Tier 1 — BirdieGrantBridge if both sides run the mod (random item, no teleport).
+    //   Tier 1 — GfGrantBridge if both sides run the mod (random item, no teleport).
     //   Tier 2 — Teleport approach: first keypress shows a confirmation warning;
     //            second keypress within 3 s teleports the player to the nearest
     //            available crate for one frame, then back. Server's OnTriggerEnter
@@ -652,8 +652,8 @@ public partial class BirdieMod
     // server-side overlap on the next physics tick.
     private void CollectFromCrateAsClient(Component localInventory)
     {
-        // Tier 1 — BirdieGrantBridge (no teleport needed).
-        if (BirdieGrantBridge.IsReady())
+        // Tier 1 — GfGrantBridge (no teleport needed).
+        if (GfGrantBridge.IsReady())
         {
             int itemTypeInt = SpawnableItems[
                 UnityEngine.Random.Range(0, SpawnableItems.Length)].TypeId;
@@ -662,7 +662,7 @@ public partial class BirdieMod
             {
                 return;
             }
-            BirdieGrantBridge.RequestGrant(localInventory, itemTypeInt);
+            GfGrantBridge.RequestGrant(localInventory, itemTypeInt);
             return;
         }
 
@@ -682,13 +682,13 @@ public partial class BirdieMod
 
         if (cachedItemSpawnerType == null || cachedItemSpawnerNetHasItemBoxProp == null)
         {
-            BirdieLog.Warning("[Birdie] Crate teleport: ItemSpawner reflection not ready.");
+            GfLog.Warning("[Gf] Crate teleport: ItemSpawner reflection not ready.");
             return;
         }
 
         if (playerMovement == null)
         {
-            BirdieLog.Warning("[Birdie] Crate teleport: player not found.");
+            GfLog.Warning("[Gf] Crate teleport: player not found.");
             return;
         }
 
@@ -697,7 +697,7 @@ public partial class BirdieMod
 
         if (nearestSpawner == null)
         {
-            BirdieLog.Warning("[Birdie] Crate teleport: no active crates in scene.");
+            GfLog.Warning("[Gf] Crate teleport: no active crates in scene.");
             return;
         }
 
@@ -804,7 +804,7 @@ public partial class BirdieMod
         {
             // ── CLIENT PATH ──────────────────────────────────────────────────
             // Coffee: ItemDispenser two-step (no mod required on host).
-            // All items: BirdieGrantBridge if both sides run this mod.
+            // All items: GfGrantBridge if both sides run this mod.
             // Otherwise: host only.
             SpawnItemAsClient(itemTypeInt);
         }
@@ -823,7 +823,7 @@ public partial class BirdieMod
 
         if (cachedItemTypeEnumType == null)
         {
-            BirdieLog.Warning("[Birdie] Item spawner: ItemType enum is not ready.");
+            GfLog.Warning("[Gf] Item spawner: ItemType enum is not ready.");
             return 0;
         }
 
@@ -834,7 +834,7 @@ public partial class BirdieMod
         }
         catch
         {
-            BirdieLog.Warning("[Birdie] Item spawner: " + item.DisplayName + " is not available in this game version.");
+            GfLog.Warning("[Gf] Item spawner: " + item.DisplayName + " is not available in this game version.");
             return 0;
         }
     }
@@ -849,14 +849,14 @@ public partial class BirdieMod
                 cachedServerTryAddItemMethod == null ||
                 cachedItemTypeEnumType == null)
             {
-                BirdieLog.Warning("[Birdie] Item spawner: host reflection cache incomplete.");
+                GfLog.Warning("[Gf] Item spawner: host reflection cache incomplete.");
                 return;
             }
 
             Component inventory = cachedLocalPlayerInventoryProperty.GetValue(null, null) as Component;
             if (inventory == null)
             {
-                BirdieLog.Warning("[Birdie] Item spawner: local player inventory not found.");
+                GfLog.Warning("[Gf] Item spawner: local player inventory not found.");
                 return;
             }
 
@@ -875,12 +875,12 @@ public partial class BirdieMod
 
             if (!added)
             {
-                BirdieLog.Warning("[Birdie] Item spawner: inventory full or item invalid.");
+                GfLog.Warning("[Gf] Item spawner: inventory full or item invalid.");
             }
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Item spawner (host): " + ex.Message);
+            GfLog.Warning("[Gf] Item spawner (host): " + ex.Message);
         }
     }
 
@@ -892,14 +892,14 @@ public partial class BirdieMod
         {
             if (cachedLocalPlayerInventoryProperty == null)
             {
-                BirdieLog.Warning("[Birdie] Item spawner: LocalPlayerInventory reflection not ready.");
+                GfLog.Warning("[Gf] Item spawner: LocalPlayerInventory reflection not ready.");
                 return;
             }
 
             Component localInventory = cachedLocalPlayerInventoryProperty.GetValue(null, null) as Component;
             if (localInventory == null)
             {
-                BirdieLog.Warning("[Birdie] Item spawner: local player inventory not found.");
+                GfLog.Warning("[Gf] Item spawner: local player inventory not found.");
                 return;
             }
 
@@ -928,26 +928,26 @@ public partial class BirdieMod
                         }
                         catch (Exception ex)
                         {
-                            BirdieLog.Warning("[Birdie] Item spawner (dispenser): " + ex.Message);
+                            GfLog.Warning("[Gf] Item spawner (dispenser): " + ex.Message);
                             // Fall through to bridge.
                         }
                     }
                 }
             }
 
-            // All items — BirdieGrantBridge if both sides run this mod.
-            if (BirdieGrantBridge.IsReady())
+            // All items — GfGrantBridge if both sides run this mod.
+            if (GfGrantBridge.IsReady())
             {
-                BirdieGrantBridge.RequestGrant(localInventory, itemTypeInt);
+                GfGrantBridge.RequestGrant(localInventory, itemTypeInt);
                 return;
             }
 
             // No client path available.
-            BirdieLog.Warning("[Birdie] Item spawner: no client grant path available — host only.");
+            GfLog.Warning("[Gf] Item spawner: no client grant path available — host only.");
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Item spawner (client): " + ex.Message);
+            GfLog.Warning("[Gf] Item spawner (client): " + ex.Message);
         }
     }
 

@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-// IMGUI-based settings panel for BirdieMod.
+// IMGUI-based settings panel for GfMod.
 //
 // Uses Unity's immediate-mode GUI (OnGUI), which is always available in any
 // MelonLoader mod regardless of whether the game uses UI Toolkit or UGUI.
@@ -12,7 +12,7 @@
 //
 // No UIDocument, no PanelSettings, no external library needed at runtime.
 
-public partial class BirdieMod
+public partial class GfMod
 {
     // ── State ────────────────────────────────────────────────────────────────
 
@@ -190,7 +190,7 @@ public partial class BirdieMod
 
     // ── OnGUI (called from entry shim) ───────────────────────────────────────
 
-    internal void BirdieOnGUI()
+    internal void GfOnGUI()
     {
         if (!settingsPanelOpen) return;
 
@@ -394,14 +394,14 @@ public partial class BirdieMod
 
     private void DrawImItems(float w)
     {
-        bool hostReady = BirdieGrantBridge.IsReady();
+        bool hostReady = GfGrantBridge.IsReady();
         GUIStyle statusStyle = new GUIStyle(_imInfoLabel);
         statusStyle.normal.textColor = hostReady
             ? new Color(0.30f, 0.85f, 0.45f)
             : new Color(0.80f, 0.35f, 0.35f);
         GUILayout.Label(hostReady
-            ? "Host has BirdieMod — items will spawn"
-            : "Host does not have BirdieMod — items require host",
+            ? "Host has GfMod — items will spawn"
+            : "Host does not have GfMod — items require host",
             statusStyle);
 
         GUILayout.Space(6f);
@@ -466,13 +466,13 @@ public partial class BirdieMod
             if (_hostWeatherRunning)
             {
                 _hostWeatherRunning = false;
-                BirdieWeatherBridge.BroadcastWeather(0, true);
+                GfWeatherBridge.BroadcastWeather(0, true);
                 ApplyWeather(0);
             }
             else
             {
                 _hostWeatherRunning = true;
-                BirdieWeatherBridge.BroadcastWeather(_hostSelectedWeather, true);
+                GfWeatherBridge.BroadcastWeather(_hostSelectedWeather, true);
                 ApplyWeather(_hostSelectedWeather);
             }
         }
@@ -518,7 +518,7 @@ public partial class BirdieMod
 
         GUILayout.Space(10f);
         ImSectionHeader("NOTES");
-        GUILayout.Label("Wind changes affect all players. Rain drag and visual effects apply to Birdie clients only.", _imInfoLabel);
+        GUILayout.Label("Wind changes affect all players. Rain drag and visual effects apply to Gf clients only.", _imInfoLabel);
 
         GUILayout.EndScrollView();
     }

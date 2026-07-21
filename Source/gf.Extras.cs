@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Reflection;
 using UnityEngine;
 
-public partial class BirdieMod
+public partial class GfMod
 {
     // ==================== NO WIND ====================
     // WindSettings lives on WindManager.windSettings (instance field), not on GameManager.
@@ -31,7 +31,7 @@ public partial class BirdieMod
 
             if (wmType == null)
             {
-                BirdieLog.Warning("[Birdie] WindManager type not found");
+                GfLog.Warning("[Gf] WindManager type not found");
                 return;
             }
 
@@ -39,7 +39,7 @@ public partial class BirdieMod
             UnityEngine.Object wmObj = UnityEngine.Object.FindFirstObjectByType(wmType);
             if (wmObj == null)
             {
-                BirdieLog.Warning("[Birdie] WindManager not found in scene");
+                GfLog.Warning("[Gf] WindManager not found in scene");
                 return;
             }
 
@@ -50,14 +50,14 @@ public partial class BirdieMod
 
             if (wsField == null)
             {
-                BirdieLog.Warning("[Birdie] WindManager.windSettings field not found");
+                GfLog.Warning("[Gf] WindManager.windSettings field not found");
                 return;
             }
 
             object ws = wsField.GetValue(wmObj);
             if (ws == null)
             {
-                BirdieLog.Warning("[Birdie] WindManager.windSettings value is null");
+                GfLog.Warning("[Gf] WindManager.windSettings value is null");
                 return;
             }
 
@@ -73,12 +73,12 @@ public partial class BirdieMod
             }
             else
             {
-                BirdieLog.Warning("[Birdie] WindSettings.forceScale field not found");
+                GfLog.Warning("[Gf] WindSettings.forceScale field not found");
             }
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Wind reflection error: " + ex.Message);
+            GfLog.Warning("[Gf] Wind reflection error: " + ex.Message);
         }
     }
 
@@ -87,7 +87,7 @@ public partial class BirdieMod
         noWindEnabled = !noWindEnabled;
         InitializeWindExtrasReflection();
 
-        BirdieLog.Msg(string.Format("[Birdie] No Wind {0} | ws={1} field={2}",
+        GfLog.Msg(string.Format("[Gf] No Wind {0} | ws={1} field={2}",
             noWindEnabled ? "ON" : "OFF",
             cachedWindSettingsInstance != null ? "OK" : "NULL",
             cachedWindForceScaleField   != null ? cachedWindForceScaleField.Name : "NULL"));
@@ -152,7 +152,7 @@ public partial class BirdieMod
             object ballSettings = GetGolfBallSettingsObject();
             if (ballSettings == null)
             {
-                BirdieLog.Warning("[Birdie] GolfBallSettings is null");
+                GfLog.Warning("[Gf] GolfBallSettings is null");
                 return;
             }
 
@@ -169,12 +169,12 @@ public partial class BirdieMod
             }
             else
             {
-                BirdieLog.Warning("[Birdie] <LinearAirDragFactor>k__BackingField not found on " + t.Name);
+                GfLog.Warning("[Gf] <LinearAirDragFactor>k__BackingField not found on " + t.Name);
             }
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] AirDrag reflection error: " + ex.Message);
+            GfLog.Warning("[Gf] AirDrag reflection error: " + ex.Message);
         }
     }
 
@@ -186,12 +186,12 @@ public partial class BirdieMod
         if (noAirDragEnabled)
         {
             ApplyNoAirDragState();
-            BirdieLog.Msg(string.Format("[Birdie] No Air Drag ON (saved={0:F5})", savedLinearAirDrag));
+            GfLog.Msg(string.Format("[Gf] No Air Drag ON (saved={0:F5})", savedLinearAirDrag));
         }
         else
         {
             RestoreAirDragState();
-            BirdieLog.Msg("[Birdie] No Air Drag OFF");
+            GfLog.Msg("[Gf] No Air Drag OFF");
         }
 
         MarkHudDirty();
@@ -266,7 +266,7 @@ public partial class BirdieMod
 
             if (gmType == null)
             {
-                BirdieLog.Warning("[Birdie] GameManager type not found");
+                GfLog.Warning("[Gf] GameManager type not found");
                 return;
             }
 
@@ -276,14 +276,14 @@ public partial class BirdieMod
 
             if (cachedPlayerMovSettingsProperty == null)
             {
-                BirdieLog.Warning("[Birdie] GameManager.PlayerMovementSettings property not found");
+                GfLog.Warning("[Gf] GameManager.PlayerMovementSettings property not found");
                 return;
             }
 
             object pms = cachedPlayerMovSettingsProperty.GetValue(null, null);
             if (pms == null)
             {
-                BirdieLog.Warning("[Birdie] PlayerMovementSettings value is null");
+                GfLog.Warning("[Gf] PlayerMovementSettings value is null");
                 return;
             }
 
@@ -300,13 +300,13 @@ public partial class BirdieMod
             }
             else
             {
-                BirdieLog.Warning("[Birdie] <DefaultMoveSpeed>k__BackingField not found on " + pmsType.Name);
+                GfLog.Warning("[Gf] <DefaultMoveSpeed>k__BackingField not found on " + pmsType.Name);
             }
 
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] MoveSpeed reflection error: " + ex.Message);
+            GfLog.Warning("[Gf] MoveSpeed reflection error: " + ex.Message);
         }
     }
 
@@ -318,12 +318,12 @@ public partial class BirdieMod
         if (speedMultiplierEnabled)
         {
             ApplySpeedMultiplierState();
-            BirdieLog.Msg(string.Format("[Birdie] Speed Multiplier ON (x{0:F1}, base={1:F2})", speedMultiplierFactor, savedDefaultMoveSpeed));
+            GfLog.Msg(string.Format("[Gf] Speed Multiplier ON (x{0:F1}, base={1:F2})", speedMultiplierFactor, savedDefaultMoveSpeed));
         }
         else
         {
             RestoreSpeedState();
-            BirdieLog.Msg("[Birdie] Speed Multiplier OFF");
+            GfLog.Msg("[Gf] Speed Multiplier OFF");
         }
 
         MarkHudDirty();
@@ -407,7 +407,7 @@ public partial class BirdieMod
 
             if (gmType == null || piType == null || isType == null)
             {
-                BirdieLog.Warning("[Birdie] Ammo: required types not found (GM=" +
+                GfLog.Warning("[Gf] Ammo: required types not found (GM=" +
                     (gmType != null ? "ok" : "NULL") + " PI=" +
                     (piType != null ? "ok" : "NULL") + " IS=" +
                     (isType != null ? "ok" : "NULL") + ")");
@@ -445,11 +445,11 @@ public partial class BirdieMod
 
             if (ok)
             {
-                BirdieLog.Msg("[Birdie] Ammo inventory reflection ready");
+                GfLog.Msg("[Gf] Ammo inventory reflection ready");
             }
             else
             {
-                BirdieLog.Warning("[Birdie] Ammo: one or more fields missing — " +
+                GfLog.Warning("[Gf] Ammo: one or more fields missing — " +
                     "inv=" + (cachedLocalPlayerInventoryProperty != null ? "ok" : "NULL") +
                     " slots=" + (cachedInventorySlotsSyncListField != null ? "ok" : "NULL") +
                     " overrides=" + (cachedInventoryOverridesDictField != null ? "ok" : "NULL") +
@@ -459,7 +459,7 @@ public partial class BirdieMod
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Ammo inventory reflection error: " + ex.Message);
+            GfLog.Warning("[Gf] Ammo inventory reflection error: " + ex.Message);
         }
     }
 
@@ -470,17 +470,17 @@ public partial class BirdieMod
         if (!infiniteAmmoEnabled)
         {
             ammoItemTypeBackup.Clear();
-            BirdieInfiniteAmmoBridge.LocalPlayerInventory = null;
+            GfInfiniteAmmoBridge.LocalPlayerInventory = null;
         }
 
-        BirdieInfiniteAmmoBridge.EnsurePatchApplied();
-        BirdieInfiniteAmmoBridge.IsActive = infiniteAmmoEnabled;
+        GfInfiniteAmmoBridge.EnsurePatchApplied();
+        GfInfiniteAmmoBridge.IsActive = infiniteAmmoEnabled;
 
-        BirdieLog.Msg(infiniteAmmoEnabled ? "[Birdie] Infinite Item Usage ON" : "[Birdie] Infinite Item Usage OFF");
+        GfLog.Msg(infiniteAmmoEnabled ? "[Gf] Infinite Item Usage ON" : "[Gf] Infinite Item Usage OFF");
         MarkHudDirty();
     }
 
-    // Called every LateUpdate. Keeps BirdieInfiniteAmmoBridge.LocalPlayerInventory
+    // Called every LateUpdate. Keeps GfInfiniteAmmoBridge.LocalPlayerInventory
     // current so the Harmony prefix can identify the local player's inventory and
     // skip DecrementUseFromSlotAt (preventing server-side ammo consumption).
     // The override-dict logic below remains as a belt-and-suspenders display fix.
@@ -513,7 +513,7 @@ public partial class BirdieMod
                 return;
             }
 
-            BirdieInfiniteAmmoBridge.LocalPlayerInventory = localInventory;
+            GfInfiniteAmmoBridge.LocalPlayerInventory = localInventory;
 
             System.Collections.IList slotsList =
                 cachedInventorySlotsSyncListField.GetValue(localInventory) as System.Collections.IList;
@@ -570,7 +570,7 @@ public partial class BirdieMod
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Infinite ammo tick error: " + ex.Message);
+            GfLog.Warning("[Gf] Infinite ammo tick error: " + ex.Message);
         }
     }
 
@@ -596,14 +596,14 @@ public partial class BirdieMod
 
             if (pmType == null)
             {
-                BirdieLog.Warning("[Birdie] No Knockback: PlayerMovement type not found");
+                GfLog.Warning("[Gf] No Knockback: PlayerMovement type not found");
                 return;
             }
 
             cachedKnockoutImmunityStatusField = pmType.GetField("knockoutImmunityStatus", BindingFlags.NonPublic | BindingFlags.Instance);
             if (cachedKnockoutImmunityStatusField == null)
             {
-                BirdieLog.Warning("[Birdie] No Knockback: knockoutImmunityStatus field not found");
+                GfLog.Warning("[Gf] No Knockback: knockoutImmunityStatus field not found");
                 return;
             }
 
@@ -611,12 +611,12 @@ public partial class BirdieMod
             cachedHasImmunityField = immunityType.GetField("hasImmunity", BindingFlags.Public | BindingFlags.Instance);
             if (cachedHasImmunityField == null)
             {
-                BirdieLog.Warning("[Birdie] No Knockback: hasImmunity field not found on " + immunityType.Name);
+                GfLog.Warning("[Gf] No Knockback: hasImmunity field not found on " + immunityType.Name);
             }
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Knockback immunity reflection error: " + ex.Message);
+            GfLog.Warning("[Gf] Knockback immunity reflection error: " + ex.Message);
             knockbackImmunityReflectionReady = false;
         }
     }
@@ -624,23 +624,23 @@ public partial class BirdieMod
     private void ToggleNoKnockback()
     {
         noKnockbackEnabled = !noKnockbackEnabled;
-        BirdieNoKnockbackBridge.EnsurePatchApplied();
-        BirdieNoKnockbackBridge.IsActive = noKnockbackEnabled;
-        BirdieLog.Msg(noKnockbackEnabled ? "[Birdie] No Knockback ON" : "[Birdie] No Knockback OFF");
+        GfNoKnockbackBridge.EnsurePatchApplied();
+        GfNoKnockbackBridge.IsActive = noKnockbackEnabled;
+        GfLog.Msg(noKnockbackEnabled ? "[Gf] No Knockback ON" : "[Gf] No Knockback OFF");
         MarkHudDirty();
     }
 
     private void ToggleLandmineImmunity()
     {
         landmineImmunityEnabled = !landmineImmunityEnabled;
-        BirdieLandmineImmunityBridge.EnsurePatchApplied();
-        BirdieLandmineImmunityBridge.IsActive = landmineImmunityEnabled;
-        BirdieLog.Msg(landmineImmunityEnabled ? "[Birdie] Landmine Immunity ON" : "[Birdie] Landmine Immunity OFF");
+        GfLandmineImmunityBridge.EnsurePatchApplied();
+        GfLandmineImmunityBridge.IsActive = landmineImmunityEnabled;
+        GfLog.Msg(landmineImmunityEnabled ? "[Gf] Landmine Immunity ON" : "[Gf] Landmine Immunity OFF");
         MarkHudDirty();
     }
 
     // Writes hasImmunity=true directly to the backing field (blocks knockout STATE),
-    // and keeps BirdieNoKnockbackBridge.LocalPlayerHittable current so the Harmony
+    // and keeps GfNoKnockbackBridge.LocalPlayerHittable current so the Harmony
     // prefix on Hittable.HitWithItem can skip AddForceAtPosition entirely.
     private void TickNoKnockback()
     {
@@ -648,8 +648,8 @@ public partial class BirdieMod
 
         if (!needHittable || playerMovement == null)
         {
-            BirdieNoKnockbackBridge.LocalPlayerHittable = null;
-            BirdieLandmineImmunityBridge.LocalPlayerHittable = null;
+            GfNoKnockbackBridge.LocalPlayerHittable = null;
+            GfLandmineImmunityBridge.LocalPlayerHittable = null;
             return;
         }
 
@@ -687,8 +687,8 @@ public partial class BirdieMod
             }
         }
 
-        BirdieNoKnockbackBridge.LocalPlayerHittable = noKnockbackEnabled ? localPlayerHittable : null;
-        BirdieLandmineImmunityBridge.LocalPlayerHittable = landmineImmunityEnabled ? localPlayerHittable : null;
+        GfNoKnockbackBridge.LocalPlayerHittable = noKnockbackEnabled ? localPlayerHittable : null;
+        GfLandmineImmunityBridge.LocalPlayerHittable = landmineImmunityEnabled ? localPlayerHittable : null;
 
         if (!noKnockbackEnabled)
         {
@@ -732,7 +732,7 @@ public partial class BirdieMod
 // AND the Command to the server (CmdHitWithItem), providing complete protection.
 // The prefix returns false (skip original) when active and the hit target is the
 // local player, preventing the force from ever being applied.
-internal static class BirdieNoKnockbackBridge
+internal static class GfNoKnockbackBridge
 {
     internal static bool IsActive;
     internal static object LocalPlayerHittable;
@@ -753,12 +753,12 @@ internal static class BirdieNoKnockbackBridge
             // This bridge depends on private game methods that differ between
             // releases. Keep the feature disabled rather than risking a broken
             // Harmony patch during startup.
-            BirdieLog.Warning("[gf Mod] No Knockback is unavailable for this game build.");
+            GfLog.Warning("[gf Mod] No Knockback is unavailable for this game build.");
             patchApplied = false;
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] No Knockback patch error: " + ex.Message);
+            GfLog.Warning("[Gf] No Knockback patch error: " + ex.Message);
             patchApplied = false;
         }
     }
@@ -799,7 +799,7 @@ internal static class BirdieNoKnockbackBridge
 // to the server, which then removes the item when uses reach zero. Skipping the
 // entire method for the local player prevents the server from ever decrementing,
 // so ammo is never consumed.
-internal static class BirdieInfiniteAmmoBridge
+internal static class GfInfiniteAmmoBridge
 {
     internal static bool IsActive;
     internal static object LocalPlayerInventory;
@@ -831,7 +831,7 @@ internal static class BirdieInfiniteAmmoBridge
 
             if (piType == null)
             {
-                BirdieLog.Warning("[Birdie] Infinite Ammo patch: PlayerInventory type not found");
+                GfLog.Warning("[Gf] Infinite Ammo patch: PlayerInventory type not found");
                 patchApplied = false;
                 return;
             }
@@ -842,7 +842,7 @@ internal static class BirdieInfiniteAmmoBridge
 
             if (decrementMethod == null)
             {
-                BirdieLog.Warning("[Birdie] Infinite Ammo patch: DecrementUseFromSlotAt not found");
+                GfLog.Warning("[Gf] Infinite Ammo patch: DecrementUseFromSlotAt not found");
                 patchApplied = false;
                 return;
             }
@@ -869,20 +869,20 @@ internal static class BirdieInfiniteAmmoBridge
 
             if (harmonyType == null || harmonyMethodType == null)
             {
-                BirdieLog.Warning("[Birdie] Infinite Ammo patch: HarmonyLib types not found");
+                GfLog.Warning("[Gf] Infinite Ammo patch: HarmonyLib types not found");
                 patchApplied = false;
                 return;
             }
 
-            object harmony = Activator.CreateInstance(harmonyType, "birdie.infiniteammo");
+            object harmony = Activator.CreateInstance(harmonyType, "gf.infiniteammo");
 
-            MethodInfo prefixMethod = typeof(BirdieInfiniteAmmoBridge).GetMethod(
+            MethodInfo prefixMethod = typeof(GfInfiniteAmmoBridge).GetMethod(
                 "Prefix",
                 BindingFlags.Static | BindingFlags.NonPublic);
 
             if (prefixMethod == null)
             {
-                BirdieLog.Warning("[Birdie] Infinite Ammo patch: Prefix method not found");
+                GfLog.Warning("[Gf] Infinite Ammo patch: Prefix method not found");
                 patchApplied = false;
                 return;
             }
@@ -909,7 +909,7 @@ internal static class BirdieInfiniteAmmoBridge
 
             if (patchMethod == null)
             {
-                BirdieLog.Warning("[Birdie] Infinite Ammo patch: Harmony.Patch overload not found");
+                GfLog.Warning("[Gf] Infinite Ammo patch: Harmony.Patch overload not found");
                 patchApplied = false;
                 return;
             }
@@ -929,11 +929,11 @@ internal static class BirdieInfiniteAmmoBridge
             }
 
             patchMethod.Invoke(harmony, args);
-            BirdieLog.Msg("[Birdie] Infinite Ammo patch: registered prefix on PlayerInventory.DecrementUseFromSlotAt");
+            GfLog.Msg("[Gf] Infinite Ammo patch: registered prefix on PlayerInventory.DecrementUseFromSlotAt");
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Infinite Ammo patch error: " + ex.Message);
+            GfLog.Warning("[Gf] Infinite Ammo patch error: " + ex.Message);
             patchApplied = false;
         }
     }
@@ -955,7 +955,7 @@ internal static class BirdieInfiniteAmmoBridge
 // When active and the hit target is the local player and the itemType is Landmine,
 // the prefix returns false to skip the entire method — preventing both local
 // execution and the Command to the server.
-internal static class BirdieLandmineImmunityBridge
+internal static class GfLandmineImmunityBridge
 {
     internal static bool IsActive;
     internal static object LocalPlayerHittable;
@@ -988,7 +988,7 @@ internal static class BirdieLandmineImmunityBridge
 
             if (hittableType == null)
             {
-                BirdieLog.Warning("[Birdie] Landmine Immunity patch: Hittable type not found");
+                GfLog.Warning("[Gf] Landmine Immunity patch: Hittable type not found");
                 patchApplied = false;
                 return;
             }
@@ -999,7 +999,7 @@ internal static class BirdieLandmineImmunityBridge
 
             if (hitWithItem == null)
             {
-                BirdieLog.Warning("[Birdie] Landmine Immunity patch: HitWithItemInternal method not found");
+                GfLog.Warning("[Gf] Landmine Immunity patch: HitWithItemInternal method not found");
                 patchApplied = false;
                 return;
             }
@@ -1038,20 +1038,20 @@ internal static class BirdieLandmineImmunityBridge
 
             if (harmonyType == null || harmonyMethodType == null)
             {
-                BirdieLog.Warning("[Birdie] Landmine Immunity patch: HarmonyLib types not found");
+                GfLog.Warning("[Gf] Landmine Immunity patch: HarmonyLib types not found");
                 patchApplied = false;
                 return;
             }
 
-            object harmony = Activator.CreateInstance(harmonyType, "birdie.landmineimmunity");
+            object harmony = Activator.CreateInstance(harmonyType, "gf.landmineimmunity");
 
-            MethodInfo prefixMethod = typeof(BirdieLandmineImmunityBridge).GetMethod(
+            MethodInfo prefixMethod = typeof(GfLandmineImmunityBridge).GetMethod(
                 "Prefix",
                 BindingFlags.Static | BindingFlags.NonPublic);
 
             if (prefixMethod == null)
             {
-                BirdieLog.Warning("[Birdie] Landmine Immunity patch: Prefix method not found");
+                GfLog.Warning("[Gf] Landmine Immunity patch: Prefix method not found");
                 patchApplied = false;
                 return;
             }
@@ -1078,7 +1078,7 @@ internal static class BirdieLandmineImmunityBridge
 
             if (patchMethod == null)
             {
-                BirdieLog.Warning("[Birdie] Landmine Immunity patch: Harmony.Patch overload not found");
+                GfLog.Warning("[Gf] Landmine Immunity patch: Harmony.Patch overload not found");
                 patchApplied = false;
                 return;
             }
@@ -1098,11 +1098,11 @@ internal static class BirdieLandmineImmunityBridge
             }
 
             patchMethod.Invoke(harmony, args);
-            BirdieLog.Msg("[Birdie] Landmine Immunity patch: registered prefix on Hittable.HitWithItemInternal");
+            GfLog.Msg("[Gf] Landmine Immunity patch: registered prefix on Hittable.HitWithItemInternal");
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Landmine Immunity patch error: " + ex.Message);
+            GfLog.Warning("[Gf] Landmine Immunity patch error: " + ex.Message);
             patchApplied = false;
         }
     }

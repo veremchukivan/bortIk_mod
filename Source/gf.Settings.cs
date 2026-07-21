@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Text;
 using TMPro;
@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
 
-public partial class BirdieMod
+public partial class GfMod
 {
     // Parallel arrays for the Keybinds tab in the settings panel.
     // Index must match GetKeybindNameByIndex / SetKeybindNameByIndex switch cases.
@@ -179,7 +179,7 @@ public partial class BirdieMod
                 cg.alpha = 0f;
                 settingsPanelObject.transform.localScale = new Vector3(0.92f, 0.92f, 1f);
             }
-            BirdieCoroutine.Start(AnimatePanelOpen());
+            GfCoroutine.Start(AnimatePanelOpen());
         }
         MarkHudDirty();
     }
@@ -192,7 +192,7 @@ public partial class BirdieMod
         ApplyCursorUnlockForSettings(false);
         ApplyGameInputSuppressionForSettings(false);
         // Coroutine deactivates panel after animation; do not call UpdateSettingsPanelVisibility() here
-        BirdieCoroutine.Start(AnimatePanelClose());
+        GfCoroutine.Start(AnimatePanelClose());
         MarkHudDirty();
     }
 
@@ -342,7 +342,7 @@ public partial class BirdieMod
         }
 
         // Root panel — 640x440, centered
-        settingsPanelObject = new GameObject("BirdieSettingsPanel");
+        settingsPanelObject = new GameObject("GfSettingsPanel");
         settingsPanelObject.transform.SetParent(parent, false);
 
         RectTransform rootRect = settingsPanelObject.AddComponent<RectTransform>();
@@ -421,7 +421,7 @@ public partial class BirdieMod
         tlRect.offsetMin = new Vector2(10f, 0f);
         tlRect.offsetMax = Vector2.zero;
         TextMeshProUGUI titleLabel = titleLabelObj.AddComponent<TextMeshProUGUI>();
-        titleLabel.text = "Birdie Settings";
+        titleLabel.text = "Gf Settings";
         titleLabel.fontSize = 15f;
         titleLabel.fontStyle = FontStyles.Bold;
         titleLabel.color = Color.white;
@@ -867,7 +867,7 @@ public partial class BirdieMod
             Color targetColor = newVal
                 ? new Color(0.22f, 0.50f, 0.90f, 1f)
                 : new Color(0.28f, 0.28f, 0.33f, 1f);
-            BirdieCoroutine.Start(AnimatePillSlide(capturedKnobRect, capturedPillBg, targetX, targetColor));
+            GfCoroutine.Start(AnimatePillSlide(capturedKnobRect, capturedPillBg, targetX, targetColor));
         }));
     }
 
@@ -1254,7 +1254,7 @@ public partial class BirdieMod
         hsRect.offsetMin = new Vector2(10f, -42f);
         hsRect.offsetMax = new Vector2(-10f, -8f);
         Image hsBg = hostStatusObj.AddComponent<Image>();
-        bool hostReady = BirdieGrantBridge.IsReady();
+        bool hostReady = GfGrantBridge.IsReady();
         hsBg.color = hostReady
             ? new Color(0.10f, 0.38f, 0.18f, 0.90f)
             : new Color(0.35f, 0.20f, 0.08f, 0.90f);
@@ -1265,8 +1265,8 @@ public partial class BirdieMod
         hsTmp.gameObject.GetComponent<RectTransform>().offsetMin = new Vector2(8f, 0f);
         hsTmp.gameObject.GetComponent<RectTransform>().offsetMax = new Vector2(-8f, 0f);
         hsTmp.text = hostReady
-            ? "Host has BirdieMod  — items can be granted"
-            : "Host does not have BirdieMod — items may be limited";
+            ? "Host has GfMod  — items can be granted"
+            : "Host does not have GfMod — items may be limited";
         hsTmp.fontSize = 11f;
         hsTmp.color = hostReady ? new Color(0.50f, 1f, 0.60f, 1f) : new Color(1f, 0.75f, 0.40f, 1f);
         hsTmp.alignment = TextAlignmentOptions.MidlineLeft;
@@ -1645,19 +1645,19 @@ public partial class BirdieMod
             TryCacheNormalDrag();
 
             // Wire the static bridge that the Harmony postfix reads from.
-            BirdieIcePatchBridge.HorizontalDragField = cachedHorizontalDragField;
-            BirdieIcePatchBridge.NormalDragValue = normalHorizontalDragValue;
+            GfIcePatchBridge.HorizontalDragField = cachedHorizontalDragField;
+            GfIcePatchBridge.NormalDragValue = normalHorizontalDragValue;
 
             // Apply the Harmony postfix patch (no-op on subsequent calls).
-            BirdieIcePatchBridge.EnsurePatchApplied();
-            BirdieIcePatchBridge.IsActive = true;
+            GfIcePatchBridge.EnsurePatchApplied();
+            GfIcePatchBridge.IsActive = true;
 
-            BirdieLog.Msg(string.Format("[Birdie] Ice immunity ON  (normal drag = {0:F3})", normalHorizontalDragValue));
+            GfLog.Msg(string.Format("[Gf] Ice immunity ON  (normal drag = {0:F3})", normalHorizontalDragValue));
         }
         else
         {
-            BirdieIcePatchBridge.IsActive = false;
-            BirdieLog.Msg("[Birdie] Ice immunity OFF");
+            GfIcePatchBridge.IsActive = false;
+            GfLog.Msg("[Gf] Ice immunity OFF");
         }
 
         MarkHudDirty();
@@ -1740,13 +1740,13 @@ public partial class BirdieMod
 
         if (cachedRewardCreditsMethod == null)
         {
-            BirdieLog.Warning("[Birdie] Credits: RewardCredits not found — game version may differ.");
+            GfLog.Warning("[Gf] Credits: RewardCredits not found — game version may differ.");
             return;
         }
 
         if (amount <= 0)
         {
-            BirdieLog.Warning("[Birdie] Credits: amount must be greater than zero.");
+            GfLog.Warning("[Gf] Credits: amount must be greater than zero.");
             return;
         }
 
@@ -1754,11 +1754,11 @@ public partial class BirdieMod
         {
             // checkCheats=false bypasses MatchSetupRules.IsCheatsEnabled() check.
             cachedRewardCreditsMethod.Invoke(null, new object[] { amount, false });
-            BirdieLog.Msg("[Birdie] Credits: granted " + amount + " credits.");
+            GfLog.Msg("[Gf] Credits: granted " + amount + " credits.");
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Credits grant: " + ex.Message);
+            GfLog.Warning("[Gf] Credits grant: " + ex.Message);
         }
     }
 }
@@ -1772,7 +1772,7 @@ public partial class BirdieMod
 //
 // EnsurePatchApplied() is called the first time ice immunity is toggled on.
 // Subsequent toggles only flip IsActive — the patch itself stays registered.
-internal static class BirdieIcePatchBridge
+internal static class GfIcePatchBridge
 {
     internal static bool IsActive;
     internal static FieldInfo HorizontalDragField;
@@ -1808,7 +1808,7 @@ internal static class BirdieIcePatchBridge
 
             if (playerMovementType == null)
             {
-                BirdieLog.Warning("[Birdie] Ice patch: PlayerMovement type not found");
+                GfLog.Warning("[Gf] Ice patch: PlayerMovement type not found");
                 patchApplied = false;
                 return;
             }
@@ -1819,7 +1819,7 @@ internal static class BirdieIcePatchBridge
 
             if (original == null)
             {
-                BirdieLog.Warning("[Birdie] Ice patch: PlayerMovement.UpdatePhysicsParameters not found");
+                GfLog.Warning("[Gf] Ice patch: PlayerMovement.UpdatePhysicsParameters not found");
                 patchApplied = false;
                 return;
             }
@@ -1850,29 +1850,29 @@ internal static class BirdieIcePatchBridge
 
             if (harmonyType == null)
             {
-                BirdieLog.Warning("[Birdie] Ice patch: HarmonyLib.Harmony not found at runtime");
+                GfLog.Warning("[Gf] Ice patch: HarmonyLib.Harmony not found at runtime");
                 patchApplied = false;
                 return;
             }
 
             if (harmonyMethodType == null)
             {
-                BirdieLog.Warning("[Birdie] Ice patch: HarmonyLib.HarmonyMethod not found at runtime");
+                GfLog.Warning("[Gf] Ice patch: HarmonyLib.HarmonyMethod not found at runtime");
                 patchApplied = false;
                 return;
             }
 
-            // Create Harmony("birdie.icephysics").
-            object harmony = Activator.CreateInstance(harmonyType, "birdie.icephysics");
+            // Create Harmony("gf.icephysics").
+            object harmony = Activator.CreateInstance(harmonyType, "gf.icephysics");
 
             // Get our static postfix method.
-            MethodInfo postfixMethod = typeof(BirdieIcePatchBridge).GetMethod(
+            MethodInfo postfixMethod = typeof(GfIcePatchBridge).GetMethod(
                 "Postfix",
                 BindingFlags.Static | BindingFlags.NonPublic);
 
             if (postfixMethod == null)
             {
-                BirdieLog.Warning("[Birdie] Ice patch: Postfix method not found on BirdieIcePatchBridge");
+                GfLog.Warning("[Gf] Ice patch: Postfix method not found on GfIcePatchBridge");
                 patchApplied = false;
                 return;
             }
@@ -1902,7 +1902,7 @@ internal static class BirdieIcePatchBridge
 
             if (patchMethod == null)
             {
-                BirdieLog.Warning("[Birdie] Ice patch: Harmony.Patch(MethodBase,...) overload not found");
+                GfLog.Warning("[Gf] Ice patch: Harmony.Patch(MethodBase,...) overload not found");
                 patchApplied = false;
                 return;
             }
@@ -1925,11 +1925,11 @@ internal static class BirdieIcePatchBridge
             }
 
             patchMethod.Invoke(harmony, patchArgs);
-            BirdieLog.Msg("[Birdie] Ice patch: Harmony postfix registered on PlayerMovement.UpdatePhysicsParameters");
+            GfLog.Msg("[Gf] Ice patch: Harmony postfix registered on PlayerMovement.UpdatePhysicsParameters");
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Ice patch error: " + ex.Message);
+            GfLog.Warning("[Gf] Ice patch error: " + ex.Message);
             patchApplied = false; // allow retry on next toggle
         }
     }
@@ -1958,8 +1958,8 @@ internal static class BirdieIcePatchBridge
                 if (now - lastLogTime >= 1f)
                 {
                     lastLogTime = now;
-                    BirdieLog.Msg(string.Format(
-                        "[Birdie] Ice immunity: horizontalDrag {0:F3} -> {1:F3}",
+                    GfLog.Msg(string.Format(
+                        "[Gf] Ice immunity: horizontalDrag {0:F3} -> {1:F3}",
                         current,
                         NormalDragValue));
                 }

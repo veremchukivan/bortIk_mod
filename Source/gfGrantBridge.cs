@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
@@ -27,12 +27,12 @@ using UnityEngine;
 // Note: the server (host) must be running this mod for the client path to
 // work in multiplayer, because the handler is registered by this code.
 
-internal static class BirdieGrantBridge
+internal static class GfGrantBridge
 {
     // The custom method-name key we register in Mirror's RPC table.
     // Mirror hashes this string to a UInt16; both sides must agree on the string.
     private const string CommandMethodName =
-        "System.Void PlayerInventory::BirdieCmdGrantItem(System.Int32)";
+        "System.Void PlayerInventory::GfCmdGrantItem(System.Int32)";
 
     // ── state ────────────────────────────────────────────────────────────────
 
@@ -101,7 +101,7 @@ internal static class BirdieGrantBridge
         {
             if (!CollectReflectionCaches())
             {
-                BirdieLog.Warning("[Birdie] Grant bridge: Mirror reflection incomplete — client item grant unavailable.");
+                GfLog.Warning("[Gf] Grant bridge: Mirror reflection incomplete — client item grant unavailable.");
                 return;
             }
 
@@ -109,7 +109,7 @@ internal static class BirdieGrantBridge
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Grant bridge init: " + ex.Message);
+            GfLog.Warning("[Gf] Grant bridge init: " + ex.Message);
         }
     }
 
@@ -129,7 +129,7 @@ internal static class BirdieGrantBridge
             mirrorWriterPoolReturn == null ||
             mirrorWriterToArraySegment == null)
         {
-            BirdieLog.Warning("[Birdie] Item spawner: grant bridge not ready (reflection incomplete).");
+            GfLog.Warning("[Gf] Item spawner: grant bridge not ready (reflection incomplete).");
             return;
         }
 
@@ -159,7 +159,7 @@ internal static class BirdieGrantBridge
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Item spawner (client bridge): " + ex.Message);
+            GfLog.Warning("[Gf] Item spawner (client bridge): " + ex.Message);
         }
         finally
         {
@@ -193,7 +193,7 @@ internal static class BirdieGrantBridge
                 cachedServerTryAddItemMethod == null ||
                 cachedItemTypeEnumType == null)
             {
-                BirdieLog.Warning("[Birdie] Grant bridge server handler: reflection incomplete.");
+                GfLog.Warning("[Gf] Grant bridge server handler: reflection incomplete.");
                 return;
             }
 
@@ -213,12 +213,12 @@ internal static class BirdieGrantBridge
 
             if (!added)
             {
-                BirdieLog.Warning("[Birdie] Item spawner (bridge server): inventory full or item invalid.");
+                GfLog.Warning("[Gf] Item spawner (bridge server): inventory full or item invalid.");
             }
         }
         catch (Exception ex)
         {
-            BirdieLog.Warning("[Birdie] Grant bridge server handler: " + ex.Message);
+            GfLog.Warning("[Gf] Grant bridge server handler: " + ex.Message);
         }
     }
 
@@ -402,7 +402,7 @@ internal static class BirdieGrantBridge
 
         if (playerInventoryType == null)
         {
-            BirdieLog.Warning("[Birdie] Grant bridge: PlayerInventory type not found.");
+            GfLog.Warning("[Gf] Grant bridge: PlayerInventory type not found.");
             return;
         }
 
@@ -410,19 +410,19 @@ internal static class BirdieGrantBridge
         //   void(Mirror.NetworkBehaviour, Mirror.NetworkReader, Mirror.NetworkConnectionToClient)
         // The method forwards its args (as object) to ServerHandleGrantItem.
         DynamicMethod dm = new DynamicMethod(
-            "BirdieGrantItemCommandHandler",
+            "GfGrantItemCommandHandler",
             typeof(void),
             new Type[] { mirrorNbType, mirrorReaderType, mirrorConnType },
-            typeof(BirdieGrantBridge).Module,
+            typeof(GfGrantBridge).Module,
             skipVisibility: true);
 
-        MethodInfo handlerMethod = typeof(BirdieGrantBridge).GetMethod(
+        MethodInfo handlerMethod = typeof(GfGrantBridge).GetMethod(
             "ServerHandleGrantItem",
             BindingFlags.Static | BindingFlags.NonPublic);
 
         if (handlerMethod == null)
         {
-            BirdieLog.Warning("[Birdie] Grant bridge: ServerHandleGrantItem not found via reflection.");
+            GfLog.Warning("[Gf] Grant bridge: ServerHandleGrantItem not found via reflection.");
             return;
         }
 
@@ -448,7 +448,7 @@ internal static class BirdieGrantBridge
 
         if (registeredCommandHash == 0)
         {
-            BirdieLog.Warning("[Birdie] Grant bridge: RegisterDelegate returned hash 0 — may indicate a collision.");
+            GfLog.Warning("[Gf] Grant bridge: RegisterDelegate returned hash 0 — may indicate a collision.");
         }
     }
 

@@ -1,8 +1,8 @@
 // Framework-agnostic logging and coroutine facades.
 // Set MsgImpl / WarnImpl / StartImpl once in the entry shim (Awake / OnApplicationStart),
-// then call BirdieLog / BirdieCoroutine freely from any partial class file.
+// then call GfLog / GfCoroutine freely from any partial class file.
 
-internal static class BirdieLog
+internal static class GfLog
 {
     internal static System.Action<string> MsgImpl;
     internal static System.Action<string> WarnImpl;
@@ -11,7 +11,7 @@ internal static class BirdieLog
     internal static void Warning(string s) => WarnImpl?.Invoke(s);
 }
 
-internal static class BirdieCoroutine
+internal static class GfCoroutine
 {
     internal static System.Action<System.Collections.IEnumerator> StartImpl;
 

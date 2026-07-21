@@ -2,22 +2,22 @@ using BepInEx;
 using BepInEx.Logging;
 
 // BepInEx entry point — compiled only in the BepInEx build.
-// Wires BirdieLog / BirdieCoroutine and bridges Unity lifecycle methods.
+// Wires GfLog / GfCoroutine and bridges Unity lifecycle methods.
 [BepInPlugin("com.cb12438.gfmod", "gf Mod", "1.2.0")]
-public partial class BirdieMod : BaseUnityPlugin
+public partial class GfMod : BaseUnityPlugin
 {
     private new ManualLogSource Logger;
 
     private void Awake()
     {
         Logger = base.Logger;
-        BirdieLog.MsgImpl  = s => Logger.LogInfo(s);
-        BirdieLog.WarnImpl = s => Logger.LogWarning(s);
-        BirdieCoroutine.StartImpl = e => StartCoroutine(e);
-        BirdieInit();
+        GfLog.MsgImpl  = s => Logger.LogInfo(s);
+        GfLog.WarnImpl = s => Logger.LogWarning(s);
+        GfCoroutine.StartImpl = e => StartCoroutine(e);
+        GfInit();
     }
 
-    private void Update()     => BirdieUpdate();
-    private void LateUpdate() => BirdieLateUpdate();
-    private void OnGUI()      => BirdieOnGUI();
+    private void Update()     => GfUpdate();
+    private void LateUpdate() => GfLateUpdate();
+    private void OnGUI()      => GfOnGUI();
 }

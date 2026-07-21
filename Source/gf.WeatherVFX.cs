@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public partial class BirdieMod
+public partial class GfMod
 {
     // ── VFX object references ─────────────────────────────────────────────────
     private GameObject     _weatherVfxRoot;
@@ -38,7 +38,7 @@ public partial class BirdieMod
     {
         WeatherVFXStop();
 
-        _weatherVfxRoot = new GameObject("BirdieWeatherVFX_Root");
+        _weatherVfxRoot = new GameObject("GfWeatherVFX_Root");
 
         _weatherAudio              = _weatherVfxRoot.AddComponent<AudioSource>();
         _weatherAudio.loop         = true;
@@ -208,7 +208,7 @@ public partial class BirdieMod
 
     private ParticleSystem CreateRainParticles(float density, float speed, float size)
     {
-        GameObject go = new GameObject("BirdieRain");
+        GameObject go = new GameObject("GfRain");
 
         // Position is updated every frame in WeatherVFXUpdate to follow the camera
         Camera activeCamera = Camera.main;
@@ -256,7 +256,7 @@ public partial class BirdieMod
 
     private ParticleSystem CreateTornadoParticles(Vector3 worldPosition)
     {
-        GameObject root = new GameObject("BirdieTornado");
+        GameObject root = new GameObject("GfTornado");
         root.transform.position = worldPosition;
 
         // ── Layer 1: funnel (very thin white ribbon streaks) ──────────────────
@@ -398,7 +398,7 @@ public partial class BirdieMod
             _lightningLight = null;
         }
 
-        GameObject lightGo = new GameObject("BirdieLightningLight");
+        GameObject lightGo = new GameObject("GfLightningLight");
         lightGo.transform.position = strikePosition + Vector3.up * 2f;
 
         _lightningLight           = lightGo.AddComponent<Light>();
@@ -458,20 +458,20 @@ public partial class BirdieMod
     internal IEnumerator LoadWeatherSounds()
     {
         string dllDir    = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
-        string soundsDir = Path.Combine(dllDir, "BirdieMod", "sounds");
+        string soundsDir = Path.Combine(dllDir, "GfMod", "sounds");
 
         yield return LoadClip(soundsDir, "rain_loop.wav",     AudioType.WAV,  c => _clipRainLoop     = c);
         yield return LoadClip(soundsDir, "wind_loop.wav",     AudioType.WAV,  c => _clipWindLoop     = c);
         yield return LoadClip(soundsDir, "wind_gust.mp3",     AudioType.MPEG, c => _clipWindGust     = c);
         yield return LoadClip(soundsDir, "thunder_crack.mp3", AudioType.MPEG, c => _clipThunderCrack = c);
         yield return LoadClip(soundsDir, "tornado_loop.mp3",  AudioType.MPEG, c => _clipTornadoLoop  = c);
-        BirdieLog.Msg("[Birdie] Weather sounds loaded.");
+        GfLog.Msg("[Gf] Weather sounds loaded.");
     }
 
     private IEnumerator LoadClip(string dir, string file, AudioType type, System.Action<AudioClip> setter)
     {
         string path = Path.Combine(dir, file);
-        if (!File.Exists(path)) { BirdieLog.Warning("[Birdie] Sound not found: " + path); yield break; }
+        if (!File.Exists(path)) { GfLog.Warning("[Gf] Sound not found: " + path); yield break; }
         string uri = "file:///" + path.Replace('\\', '/');
         using (var req = UnityWebRequestMultimedia.GetAudioClip(uri, type))
         {
@@ -479,7 +479,7 @@ public partial class BirdieMod
             if (req.result == UnityWebRequest.Result.Success)
                 setter(DownloadHandlerAudioClip.GetContent(req));
             else
-                BirdieLog.Warning("[Birdie] Failed to load sound: " + file + " — " + req.error);
+                GfLog.Warning("[Gf] Failed to load sound: " + file + " — " + req.error);
         }
     }
 }

@@ -11,7 +11,7 @@ internal enum WeatherType : byte
     Thunderstorm    = 7, Tornado         = 8
 }
 
-public partial class BirdieMod
+public partial class GfMod
 {
     // ── Weather fields ────────────────────────────────────────────────────────
     private byte     _currentWeatherType;
@@ -65,17 +65,17 @@ public partial class BirdieMod
         _gustRunning = false;
         _lightningRunning = false;
         _wAirDragReady = false;  // reset so drag reflection retries on next weather start
-        BirdieWeatherBridge.EnsureHandlersRegistered();
-        BirdieCoroutine.Start(LoadWeatherSounds());
+        GfWeatherBridge.EnsureHandlersRegistered();
+        GfCoroutine.Start(LoadWeatherSounds());
         SubscribeHoleChangeEvent();
     }
 
     internal void WeatherSystemUpdate()
     {
-        if (BirdieWeatherBridge.ReceivedNewWeather)
+        if (GfWeatherBridge.ReceivedNewWeather)
         {
-            BirdieWeatherBridge.ReceivedNewWeather = false;
-            ApplyWeather(BirdieWeatherBridge.ReceivedWeatherType);
+            GfWeatherBridge.ReceivedNewWeather = false;
+            ApplyWeather(GfWeatherBridge.ReceivedWeatherType);
         }
 
         if (IsNetworkHost() && _currentWeatherType != 0)
@@ -85,14 +85,14 @@ public partial class BirdieMod
             if (now >= _nextGustTime && !_gustRunning)
             {
                 _gustRunning = true;
-                BirdieCoroutine.Start(HostGustCoroutine());
+                GfCoroutine.Start(HostGustCoroutine());
             }
 
             if (_currentWeatherType == (byte)WeatherType.Thunderstorm
                 && now >= _nextLightningTime && !_lightningRunning)
             {
                 _lightningRunning = true;
-                BirdieCoroutine.Start(HostLightningCoroutine());
+                GfCoroutine.Start(HostLightningCoroutine());
             }
 
             if (_currentWeatherType == (byte)WeatherType.Tornado)
@@ -127,7 +127,7 @@ public partial class BirdieMod
             Vector3 fling   = Vector3.up * 18f + outward * 14f;
             FlingPlayer(playerMovement, fling);
         }
-        catch (Exception ex) { BirdieLog.Warning("[Birdie] Tornado fling: " + ex.Message); }
+        catch (Exception ex) { GfLog.Warning("[Gf] Tornado fling: " + ex.Message); }
     }
 
     internal void ApplyWeather(byte weatherType)
@@ -146,7 +146,7 @@ public partial class BirdieMod
             _gustRunning = _lightningRunning = false;
         }
 
-        BirdieLog.Msg("[Birdie] Weather: " + (WeatherType)weatherType);
+        GfLog.Msg("[Gf] Weather: " + (WeatherType)weatherType);
     }
 
     private void StopWeatherEffects()
@@ -222,13 +222,13 @@ public partial class BirdieMod
             _wAirDragField = t.GetField("<LinearAirDragFactor>k__BackingField",
                 BindingFlags.NonPublic | BindingFlags.Instance);
             if (_wAirDragField == null || _wAirDragField.FieldType != typeof(float))
-            { BirdieLog.Warning("[Birdie] Weather drag: field not found on " + t.Name); _wAirDragField = null; return; }
+            { GfLog.Warning("[Gf] Weather drag: field not found on " + t.Name); _wAirDragField = null; return; }
             _wBallSettings         = bs;
             _originalLinearAirDrag = (float)_wAirDragField.GetValue(bs);
             _originalAirDragCached = true;
             _wAirDragReady         = true;  // only set on full success
         }
-        catch (Exception ex) { BirdieLog.Warning("[Birdie] Weather drag reflection: " + ex.Message); }
+        catch (Exception ex) { GfLog.Warning("[Gf] Weather drag reflection: " + ex.Message); }
     }
 
     private void ApplyDragMultiplier(float mul)
@@ -241,7 +241,7 @@ public partial class BirdieMod
     {
         if (_wAirDragField == null || _wBallSettings == null) return;
         try { _wAirDragField.SetValue(_wBallSettings, v); }
-        catch (Exception ex) { BirdieLog.Warning("[Birdie] Weather SetDrag: " + ex.Message); }
+        catch (Exception ex) { GfLog.Warning("[Gf] Weather SetDrag: " + ex.Message); }
     }
 
     // ── Wind scale reflection ─────────────────────────────────────────────────
@@ -255,29 +255,29 @@ public partial class BirdieMod
             Type wmType = null;
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
             { wmType = asm.GetType("WindManager"); if (wmType != null) break; }
-            if (wmType == null) { BirdieLog.Warning("[Birdie] Weather wind: WindManager not found"); return; }
+            if (wmType == null) { GfLog.Warning("[Gf] Weather wind: WindManager not found"); return; }
 
             UnityEngine.Object wmObj = UnityEngine.Object.FindFirstObjectByType(wmType);
-            if (wmObj == null) { BirdieLog.Warning("[Birdie] Weather wind: WindManager not in scene"); return; }
+            if (wmObj == null) { GfLog.Warning("[Gf] Weather wind: WindManager not in scene"); return; }
 
             FieldInfo wsF = wmType.GetField("windSettings",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (wsF == null) { BirdieLog.Warning("[Birdie] Weather wind: windSettings field missing"); return; }
+            if (wsF == null) { GfLog.Warning("[Gf] Weather wind: windSettings field missing"); return; }
 
             object ws = wsF.GetValue(wmObj);
-            if (ws == null) { BirdieLog.Warning("[Birdie] Weather wind: windSettings null"); return; }
+            if (ws == null) { GfLog.Warning("[Gf] Weather wind: windSettings null"); return; }
 
             FieldInfo fsF = ws.GetType().GetField("forceScale",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (fsF == null || fsF.FieldType != typeof(float))
-            { BirdieLog.Warning("[Birdie] Weather wind: forceScale not found"); return; }
+            { GfLog.Warning("[Gf] Weather wind: forceScale not found"); return; }
 
             _wWindSettings          = ws;
             _wWindScaleField        = fsF;
             _originalWindForceScale = (float)fsF.GetValue(ws);
             _originalWindForceScaleCached = true;
         }
-        catch (Exception ex) { BirdieLog.Warning("[Birdie] Weather wind reflection: " + ex.Message); }
+        catch (Exception ex) { GfLog.Warning("[Gf] Weather wind reflection: " + ex.Message); }
     }
 
     private void ApplyWindScale(float scale) { EnsureWindReflection(); SetWindScaleValue(scale); }
@@ -286,7 +286,7 @@ public partial class BirdieMod
     {
         if (_wWindScaleField == null || _wWindSettings == null) return;
         try { _wWindScaleField.SetValue(_wWindSettings, v); }
-        catch (Exception ex) { BirdieLog.Warning("[Birdie] Weather SetWindScale: " + ex.Message); }
+        catch (Exception ex) { GfLog.Warning("[Gf] Weather SetWindScale: " + ex.Message); }
     }
 
     // ── WindManager SyncVar reflection ────────────────────────────────────────
@@ -299,15 +299,15 @@ public partial class BirdieMod
         {
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
             { _wWmType = asm.GetType("WindManager"); if (_wWmType != null) break; }
-            if (_wWmType == null) { BirdieLog.Warning("[Birdie] Weather WM sync: type not found"); return; }
+            if (_wWmType == null) { GfLog.Warning("[Gf] Weather WM sync: type not found"); return; }
             _wWmSpeedProp = _wWmType.GetProperty("NetworkcurrentWindSpeed",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             _wWmAngleProp = _wWmType.GetProperty("NetworkcurrentWindAngle",
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (_wWmSpeedProp == null) BirdieLog.Warning("[Birdie] Weather WM: NetworkcurrentWindSpeed missing");
-            if (_wWmAngleProp == null) BirdieLog.Warning("[Birdie] Weather WM: NetworkcurrentWindAngle missing");
+            if (_wWmSpeedProp == null) GfLog.Warning("[Gf] Weather WM: NetworkcurrentWindSpeed missing");
+            if (_wWmAngleProp == null) GfLog.Warning("[Gf] Weather WM: NetworkcurrentWindAngle missing");
         }
-        catch (Exception ex) { BirdieLog.Warning("[Birdie] Weather WM sync reflection: " + ex.Message); }
+        catch (Exception ex) { GfLog.Warning("[Gf] Weather WM sync reflection: " + ex.Message); }
     }
 
     // ── Host coroutines ───────────────────────────────────────────────────────
@@ -342,7 +342,7 @@ public partial class BirdieMod
                         }
                     }
                 }
-                catch (Exception ex) { BirdieLog.Warning("[Birdie] Gust set: " + ex.Message); }
+                catch (Exception ex) { GfLog.Warning("[Gf] Gust set: " + ex.Message); }
 
                 PlayGustSound();
 
@@ -381,7 +381,7 @@ public partial class BirdieMod
                 Vector3 fling = Vector3.up * 28f + UnityEngine.Random.insideUnitSphere.normalized * 16f;
                 FlingPlayer(target, fling);
             }
-            catch (Exception ex) { BirdieLog.Warning("[Birdie] Lightning strike: " + ex.Message); }
+            catch (Exception ex) { GfLog.Warning("[Gf] Lightning strike: " + ex.Message); }
         }
         _lightningRunning = false;
     }
@@ -428,7 +428,7 @@ public partial class BirdieMod
             if (lvProp != null && lvProp.CanWrite)
                 lvProp.SetValue(rb, vel);
         }
-        catch (Exception ex) { BirdieLog.Warning("[Birdie] FlingPlayer: " + ex.Message); }
+        catch (Exception ex) { GfLog.Warning("[Gf] FlingPlayer: " + ex.Message); }
     }
 
     private void SetBaseWind(WeatherType t)
@@ -455,7 +455,7 @@ public partial class BirdieMod
             _wWmSpeedProp.SetValue(wm, speed, null);
             _wWmAngleProp.SetValue(wm, UnityEngine.Random.Range(0, 360), null);
         }
-        catch (Exception ex) { BirdieLog.Warning("[Birdie] SetBaseWind: " + ex.Message); }
+        catch (Exception ex) { GfLog.Warning("[Gf] SetBaseWind: " + ex.Message); }
     }
 
     // ── Auto weather ──────────────────────────────────────────────────────────
@@ -474,7 +474,7 @@ public partial class BirdieMod
                 BindingFlags.Public | BindingFlags.Static);
             if (ei == null) return;
 
-            MethodInfo mi = typeof(BirdieMod).GetMethod("OnHoleChanged",
+            MethodInfo mi = typeof(GfMod).GetMethod("OnHoleChanged",
                 BindingFlags.NonPublic | BindingFlags.Instance);
             if (mi == null) return;
 
@@ -482,7 +482,7 @@ public partial class BirdieMod
             ei.AddEventHandler(null, d);
             _holeEventSubscribed = true;
         }
-        catch (Exception ex) { BirdieLog.Warning("[Birdie] Weather hole-event sub: " + ex.Message); }
+        catch (Exception ex) { GfLog.Warning("[Gf] Weather hole-event sub: " + ex.Message); }
     }
 
     private void OnHoleChanged()
@@ -493,13 +493,13 @@ public partial class BirdieMod
         if (_hostWeatherRunning)
         {
             _hostWeatherRunning = false;
-            BirdieWeatherBridge.BroadcastWeather(0, true);
+            GfWeatherBridge.BroadcastWeather(0, true);
             ApplyWeather(0);
         }
 
         // Roll against spawn chance
         if (UnityEngine.Random.Range(0, 100) < autoWeatherChance)
-            BirdieCoroutine.Start(AutoSpawnWeatherCoroutine());
+            GfCoroutine.Start(AutoSpawnWeatherCoroutine());
     }
 
     private IEnumerator AutoSpawnWeatherCoroutine()
@@ -525,9 +525,9 @@ public partial class BirdieMod
 
         _hostSelectedWeather = pick;
         _hostWeatherRunning  = true;
-        BirdieWeatherBridge.BroadcastWeather(pick, true);
+        GfWeatherBridge.BroadcastWeather(pick, true);
         ApplyWeather(pick);
-        BirdieLog.Msg("[Birdie] Auto-weather spawned: " + (WeatherType)pick);
+        GfLog.Msg("[Gf] Auto-weather spawned: " + (WeatherType)pick);
     }
 
 }
